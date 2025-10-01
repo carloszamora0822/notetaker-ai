@@ -45,13 +45,15 @@ EOF
     # Compile
     start_time=$(date +%s)
     cd "$TEMPLATES_DIR"
-    if latexmk -xelatex -halt-on-error -interaction=nonstopmode "${output_name}.tex" >/dev/null 2>&1; then
+    if pdflatex -halt-on-error -interaction=nonstopmode "${output_name}.tex" >/dev/null 2>&1; then
       end_time=$(date +%s)
       compile_time=$((end_time - start_time))
 
       # Move PDF to output directory
       if [ -f "${output_name}.pdf" ]; then
         mv "${output_name}.pdf" "../${OUTPUT_DIR}/"
+        # Clean up auxiliary files
+        rm -f "${output_name}.aux" "${output_name}.log" "${output_name}.out" 2>/dev/null
         echo "[LaTeX] Compiled: ${OUTPUT_DIR}/${output_name}.pdf"
 
         # Write success result
