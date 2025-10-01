@@ -60,13 +60,26 @@ async function loadFiles() {
             </button>
           </div>
           <div class="class-files">
-            ${files.map(f => `
-              <div class="file-card" onclick="openViewer('${f.filename}')">
+            ${files.map(f => {
+              // Format date - use content_date if available, else upload_timestamp
+              const displayDate = f.content_date || new Date(f.upload_timestamp).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+              });
+              
+              // Build tooltip with metadata
+              const tooltip = `Original file: ${f.original_filename || f.filename}\nUploaded: ${new Date(f.upload_timestamp).toLocaleString()}`;
+              
+              return `
+              <div class="file-card" onclick="openViewer('${f.filename}')" title="${tooltip}">
                 <div class="file-icon">📄</div>
                 <div class="file-info">
-                  <div class="file-name">${f.filename}</div>
+                  <div class="file-name">${f.title || f.filename}</div>
                   <div class="file-meta">
-                    <span>${f.date}</span>
+                    <span>Class: ${className}</span>
+                    <span class="date-separator">|</span>
+                    <span>Date: ${displayDate}</span>
                   </div>
                 </div>
                 <div class="file-actions">
@@ -76,7 +89,8 @@ async function loadFiles() {
                   </button>
                 </div>
               </div>
-            `).join('')}
+            `;
+            }).join('')}
           </div>
         </div>
       `;
@@ -93,7 +107,8 @@ async function openViewer(filename) {
     const res = await fetch(`/api/file/${filename}`);
     const data = await res.json();
     
-    document.getElementById('viewerTitle').textContent = filename;
+    // Show AI-generated title or fallback to filename
+    document.getElementById('viewerTitle').textContent = data.title || filename;
     document.getElementById('fileContent').value = data.content;
     
     document.getElementById('viewerModal').classList.remove('hidden');

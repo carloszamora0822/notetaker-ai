@@ -47,11 +47,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const statusDiv = document.getElementById('uploadStatus');
 
+      // Create progress steps UI (5 steps)
       statusDiv.className = 'status';
-      statusDiv.textContent = 'Uploading...';
+      statusDiv.innerHTML = `
+        <div class="upload-progress">
+          <div class="progress-step active" id="step1">
+            <div class="step-icon">📤</div>
+            <div class="step-text">Uploading...</div>
+          </div>
+          <div class="progress-step" id="step2">
+            <div class="step-icon">🤖</div>
+            <div class="step-text">Generating title...</div>
+          </div>
+          <div class="progress-step" id="step3">
+            <div class="step-icon">✨</div>
+            <div class="step-text">Formatting...</div>
+          </div>
+          <div class="progress-step" id="step4">
+            <div class="step-icon">📄</div>
+            <div class="step-text">Creating PDF...</div>
+          </div>
+          <div class="progress-step" id="step5">
+            <div class="step-icon">💾</div>
+            <div class="step-text">Saving...</div>
+          </div>
+        </div>
+      `;
       statusDiv.classList.remove('hidden');
 
       try {
+        // Step 1: Upload complete
+        setTimeout(() => {
+          document.getElementById('step1').classList.add('complete');
+          document.getElementById('step2').classList.add('active');
+        }, 500);
+
         const response = await fetch('/ingest', {
           method: 'POST',
           body: formData
@@ -60,10 +90,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await response.json();
 
         if (response.ok) {
+          // Step 2: Title generation complete
+          document.getElementById('step2').classList.remove('active');
+          document.getElementById('step2').classList.add('complete');
+          document.getElementById('step3').classList.add('active');
+          
+          // Step 3: Formatting complete
+          await new Promise(r => setTimeout(r, 300));
+          document.getElementById('step3').classList.remove('active');
+          document.getElementById('step3').classList.add('complete');
+          document.getElementById('step4').classList.add('active');
+          
+          // Step 4: PDF generation complete
+          await new Promise(r => setTimeout(r, 300));
+          document.getElementById('step4').classList.remove('active');
+          document.getElementById('step4').classList.add('complete');
+          document.getElementById('step5').classList.add('active');
+          
+          // Step 5: Saving complete
+          await new Promise(r => setTimeout(r, 200));
+          document.getElementById('step5').classList.remove('active');
+          document.getElementById('step5').classList.add('complete');
+          
+          // Show final success message
+          await new Promise(r => setTimeout(r, 300));
           statusDiv.className = 'status success';
 
-          // Build success message
+          // Build success message with AI-generated title
           let message = '✓ Uploaded successfully!';
+          
+          // Show AI-generated title
+          if (result.title) {
+            message += `<br><strong>Saved as:</strong> ${result.title}.txt`;
+          }
 
           // Show LLM formatting status
           if (result.llm_formatted) {
