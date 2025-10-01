@@ -8,28 +8,7 @@ install-latex: ## Install LaTeX dependencies (macOS)
 		echo "✅ LaTeX already installed"; \
 	fi
 
-start: ## Start all services in background (one command!)
-	@echo "🚀 Starting notetaker-ai..."
-	@mkdir -p logs
-	@if [ ! -d "$(VENV)" ]; then \
-		echo "❌ Virtual environment not found. Run 'make bootstrap' first."; \
-		exit 1; \
-	fi
-	@echo "Starting backend server..."
-	@$(BIN)/uvicorn backend.main:app --host 0.0.0.0 --port 8000 > logs/backend.log 2>&1 & echo $$! > logs/backend.pid
-	@sleep 3
-	@if lsof -ti:8000 >/dev/null 2>&1; then \
-		echo "✅ Backend started on http://localhost:8000"; \
-	else \
-		echo "❌ Backend failed to start. Check logs/backend.log"; \
-		exit 1; \
-	fi
-	@echo ""
-	@echo "🎉 System ready!"
-	@echo "   📱 Open: http://localhost:8000/upload"
-	@echo "   🔍 Search: http://localhost:8000/search"
-	@echo "   📊 Status: make status"
-	@echo "   🛑 Stop: make stop"
+# Note: start target is defined later in file (uses start.sh)
 
 # Note: stop target is defined later in file with improved functionality
 
