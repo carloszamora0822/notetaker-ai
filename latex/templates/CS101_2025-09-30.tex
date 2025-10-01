@@ -1,0 +1,38 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+
+% Define custom colors
+\definecolor{ClassColor}{HTML}{0B72B9}
+\definecolor{SectionColor}{HTML}{2C3E50}
+
+% Section formatting
+\titleformat{\section}
+  {\large\bfseries\color{ClassColor}}
+  {}{0pt}{}
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{SectionColor}}
+  {}{0pt}{}
+
+% Header/footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{CS101}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+
+\title{Introduction to Algorithms}
+\date{2025-09-30}
+\maketitle
+
+\section{Summary}
+This lecture covers fundamental algorithms including sorting and searching. We discuss Big O notation, time complexity, and space complexity. Key algorithms covered: QuickSort, MergeSort, Binary Search.
+
+\end{document}

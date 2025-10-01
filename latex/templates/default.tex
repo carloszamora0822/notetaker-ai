@@ -1,0 +1,52 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+
+% Define custom colors
+\definecolor{ClassColor}{HTML}{0B72B9}
+\definecolor{SectionColor}{HTML}{2C3E50}
+
+% Section formatting
+\titleformat{\section}
+  {\large\bfseries\color{ClassColor}}
+  {}{0pt}{}
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{SectionColor}}
+  {}{0pt}{}
+
+% Header/footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{Lecture Notes}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+
+\title{Default LaTeX Template}
+\author{NoteTaker AI}
+\date{\today}
+\maketitle
+
+\section{Introduction}
+
+This is the default LaTeX template for NoteTaker AI. It will be used to generate PDF lecture notes.
+
+\section{Features}
+
+\begin{itemize}
+  \item Clean, professional formatting
+  \item Custom color scheme
+  \item Automatic table of contents
+  \item Hyperlinked references
+\end{itemize}
+
+\section{Usage}
+
+This template is compiled automatically by the LaTeX watcher service when JSON input files are detected in the queue.
+
+\end{document}
