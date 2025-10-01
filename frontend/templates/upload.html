@@ -8,13 +8,28 @@
 
   <form id="uploadForm" action="/ingest" method="POST" enctype="multipart/form-data">
     <div class="form-group">
-      <label for="file">Select file (.txt, .md, .pdf)</label>
+      <label for="file">Select File</label>
       <input type="file" id="file" name="file" required>
     </div>
 
     <div class="form-group">
-      <label for="class_code">Class Code (optional)</label>
-      <input type="text" id="class_code" name="class_code" placeholder="e.g., CS101">
+      <label for="class_code">Class</label>
+      <div class="class-selector">
+        <select id="class_code" name="class_code">
+          <option value="">Select class...</option>
+          <!-- Loaded dynamically -->
+        </select>
+        <button type="button" onclick="showNewClassInput()" class="btn-secondary">
+          + New Class
+        </button>
+      </div>
+      
+      <!-- Hidden input for new class -->
+      <input type="text" 
+             id="new_class_code" 
+             placeholder="Enter new class code (e.g., CS101)" 
+             class="hidden"
+             style="margin-top: 10px;">
     </div>
 
     <button type="submit">Upload</button>

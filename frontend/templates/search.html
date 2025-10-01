@@ -7,17 +7,13 @@
   <h2>Search Your Notes</h2>
 
   <form id="searchForm">
-    <div class="form-group">
-      <input type="text" id="query" name="q" placeholder="Ask a question..." required>
-      <button type="submit">Search</button>
-    </div>
-
-    <div class="form-group">
-      <label for="scope">Scope</label>
+    <div class="form-group search-bar">
+      <input type="text" id="query" name="q" placeholder="Ask a question about your notes..." required>
       <select id="scope" name="scope">
         <option value="all">All Classes</option>
-        <option value="current">Current Semester</option>
+        <!-- Loaded dynamically -->
       </select>
+      <button type="submit">🔍 Search</button>
     </div>
   </form>
 

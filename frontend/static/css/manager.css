@@ -4,9 +4,89 @@
   padding: 20px;
 }
 
+.manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.manager-header h1 {
+  margin: 0;
+}
+
 .file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Class Section */
+.class-section {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.class-header {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 4px solid #0B72B9;
+}
+
+.class-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.class-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+
+.class-title h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #333;
+}
+
+.file-count {
+  background: rgba(255,255,255,0.7);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: #666;
+}
+
+.btn-edit-theme {
+  background: white;
+  color: #0B72B9;
+  border: 2px solid #0B72B9;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.btn-edit-theme:hover {
+  background: #0B72B9;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(11, 114, 185, 0.3);
+}
+
+.class-files {
+  padding: 15px;
   display: grid;
-  gap: 15px;
+  gap: 10px;
 }
 
 .file-card {
@@ -58,6 +138,30 @@
   color: white;
   padding: 2px 8px;
   border-radius: 4px;
+}
+
+.file-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-pdf {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.btn-pdf:hover {
+  background: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
 }
 
 .btn-icon {
@@ -146,4 +250,158 @@
   border: none;
   font-size: 30px;
   cursor: pointer;
+}
+
+/* Theme Editor Styles */
+.color-picker-section {
+  margin-bottom: 30px;
+}
+
+.color-picker-section label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.color-swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+}
+
+.color-swatch {
+  text-align: center;
+  padding: 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.color-swatch:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.color-swatch.active {
+  border-color: #0B72B9;
+  background: #f0f8ff;
+  box-shadow: 0 0 0 3px rgba(11, 114, 185, 0.2);
+}
+
+.swatch-color {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin: 0 auto 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.color-swatch span {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  text-transform: capitalize;
+}
+
+.preview-section h3 {
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.theme-preview {
+  padding: 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.btn-primary {
+  background: #0B72B9;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: #095a94;
+}
+
+/* Class Management Modal */
+.class-manage-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.class-manage-card .class-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.class-manage-card .class-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+
+.class-manage-card strong {
+  font-size: 16px;
+  color: #333;
+}
+
+.class-manage-card .file-count {
+  background: #f0f0f0;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.class-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.class-actions .btn-edit {
+  background: #0B72B9;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.class-actions .btn-edit:hover {
+  background: #095a94;
+}
+
+.class-actions .btn-danger {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.class-actions .btn-danger:hover {
+  background: #c82333;
 }

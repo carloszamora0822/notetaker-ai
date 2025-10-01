@@ -4,14 +4,19 @@
 <link rel="stylesheet" href="/static/css/manager.css">
 
 <div class="manager-container">
-  <h1>📚 Note Manager</h1>
+  <div class="manager-header">
+    <h1>📚 Note Manager</h1>
+    <button onclick="openClassManager()" class="btn-primary">
+      ⚙️ Manage Classes
+    </button>
+  </div>
   
   <div class="file-list" id="fileList">
     <div class="loading">Loading...</div>
   </div>
 </div>
 
-<!-- Modal for viewing/editing -->
+<!-- File Viewer Modal -->
 <div id="viewerModal" class="modal hidden">
   <div class="modal-content">
     <div class="modal-header">
@@ -19,13 +24,55 @@
       <button class="close-btn" onclick="closeViewer()">&times;</button>
     </div>
     <div class="modal-body">
-      <textarea id="fileContent" rows="20"></textarea>
-      <iframe id="pdfViewer" class="hidden" width="100%" height="600px"></iframe>
+      <textarea id="fileContent" rows="20" readonly></textarea>
     </div>
     <div class="modal-footer">
       <button onclick="deleteFile()" class="btn-danger">🗑️ Delete</button>
-      <button onclick="viewPDF()" id="viewPdfBtn">📄 View PDF</button>
       <button onclick="closeViewer()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Theme Editor Modal -->
+<div id="themeModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>🎨 Edit Theme: <span id="themeClassName"></span></h2>
+      <button class="close-btn" onclick="closeThemeEditor()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="color-picker-section">
+        <label>Choose Color:</label>
+        <div class="color-swatches" id="colorSwatches">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+      <div class="preview-section">
+        <h3>Preview</h3>
+        <div class="theme-preview" id="themePreview" style="padding: 20px; border-radius: 8px; color: white; font-weight: bold;">
+          <span id="previewClassName">Class Name</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="saveTheme()" class="btn-primary">💾 Save Theme</button>
+      <button onclick="closeThemeEditor()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Class Management Modal -->
+<div id="classManagerModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>⚙️ Manage Classes</h2>
+      <button class="close-btn" onclick="closeClassManager()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p>Delete empty classes or edit their themes</p>
+      <div id="classList">
+        <!-- Loaded dynamically -->
+      </div>
     </div>
   </div>
 </div>
