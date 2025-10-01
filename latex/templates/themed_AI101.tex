@@ -7,14 +7,14 @@
 \geometry{margin=1in}
 
 % Theme colors (will be replaced by generator)
-\definecolor{primarycolor}{HTML}{PRIMARY_COLOR}
-\definecolor{secondarycolor}{HTML}{SECONDARY_COLOR}
+\definecolor{primarycolor}{HTML}{0B72B9}
+\definecolor{secondarycolor}{HTML}{64B5F6}
 
 % Header styling
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\textcolor{primarycolor}{\textbf{CLASS_NAME}}}
-\fancyhead[R]{\textcolor{secondarycolor}{DATE}}
+\fancyhead[L]{\textcolor{primarycolor}{\textbf{AI101}}}
+\fancyhead[R]{\textcolor{secondarycolor}{2025-10-01}}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{2pt}
 \renewcommand{\headrule}{\hbox to\headwidth{\color{primarycolor}\leaders\hrule height \headrulewidth\hfill}}
@@ -27,22 +27,10 @@
     citecolor=primarycolor
 }
 
-% Section formatting
-\usepackage{titlesec}
-\titleformat{\section}
-  {\Large\bfseries\color{primarycolor}}
-  {}{0pt}{}
-\titleformat{\subsection}
-  {\large\bfseries\color{secondarycolor}}
-  {}{0pt}{}
-\titleformat{\subsubsection}
-  {\normalsize\bfseries\color{secondarycolor}}
-  {}{0pt}{}
-
 % Title styling
-\title{\textcolor{primarycolor}{\Huge\textbf{CLASS_NAME Notes}}}
+\title{\textcolor{primarycolor}{\Huge\textbf{AI101 Notes}}}
 \author{}
-\date{\textcolor{secondarycolor}{DATE}}
+\date{\textcolor{secondarycolor}{2025-10-01}}
 
 \begin{document}
 
@@ -52,9 +40,9 @@
         \parbox{0.95\textwidth}{%
             \centering
             \vspace{0.5cm}
-            {\Huge\textcolor{primarycolor}{\textbf{CLASS_NAME}}} \\[0.5cm]
+            {\Huge\textcolor{primarycolor}{\textbf{AI101}}} \\[0.5cm]
             {\Large Lecture Notes} \\[0.3cm]
-            {\large\textcolor{secondarycolor}{DATE}}
+            {\large\textcolor{secondarycolor}{2025-10-01}}
             \vspace{0.5cm}
         }
     }
@@ -63,7 +51,8 @@
 \vspace{1cm}
 
 % Content section
-CONTENT
+\section*{\textcolor{primarycolor}{Summary}}
+This lecture covers machine learning fundamentals including supervised and unsupervised learning algorithms.
 
 \vspace{1cm}
 

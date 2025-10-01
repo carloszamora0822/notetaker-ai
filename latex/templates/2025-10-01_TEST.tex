@@ -1,0 +1,38 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{parskip}
+
+% Define custom colors
+\definecolor{ClassColor}{HTML}{0B72B9}
+\definecolor{SectionColor}{HTML}{2C3E50}
+
+% Section formatting
+\titleformat{\section}
+  {\large\bfseries\color{ClassColor}}
+  {}{0pt}{}
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{SectionColor}}
+  {}{0pt}{}
+
+% Header/footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\thepage}
+\lhead{TEST}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\begin{document}
+
+\title{Test Lecture - PDF Generation}
+\date{2025-10-01}
+\maketitle
+
+\section{Summary}
+This is a test lecture for PDF generation. We cover the basics of algorithms including: sorting algorithms like QuickSort and MergeSort, searching algorithms like Binary Search, and complexity analysis with Big O notation.
+
+\end{document}
