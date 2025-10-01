@@ -3,11 +3,14 @@
 {% block title %}Search Notes - notetaker-ai{% endblock %}
 
 {% block content %}
-<section class="search">
-  <h2>Search Your Notes</h2>
+<div class="search-container">
+  <div class="search-header">
+    <h1>🔎 Search Your Notes</h1>
+    <p class="subtitle">Ask questions and get AI-powered answers from your notes</p>
+  </div>
 
   <form id="searchForm">
-    <div class="form-group search-bar">
+    <div class="search-bar">
       <input type="text" id="query" name="q" placeholder="Ask a question about your notes..." required>
       <select id="scope" name="scope">
         <option value="all">All Classes</option>
@@ -18,15 +21,7 @@
   </form>
 
   <div id="results" class="results">
-    <div class="answer hidden">
-      <h3>Answer</h3>
-      <p id="answerText"></p>
-    </div>
-
-    <div class="citations hidden">
-      <h3>Sources</h3>
-      <ul id="citationList"></ul>
-    </div>
+    <!-- Results loaded dynamically -->
   </div>
-</section>
+</div>
 {% endblock %}

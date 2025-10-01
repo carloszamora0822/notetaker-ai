@@ -216,6 +216,12 @@
   overflow-y: auto;
 }
 
+.modal-description {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
 .modal-body textarea {
   width: 100%;
   padding: 10px;

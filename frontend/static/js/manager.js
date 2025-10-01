@@ -106,6 +106,12 @@ function editTheme(className) {
   currentEditClass = className;
   const theme = themes[className] || themes.default || {};
   
+  // Close class manager modal if it's open to prevent stacking
+  const classManagerModal = document.getElementById('classManagerModal');
+  if (classManagerModal && !classManagerModal.classList.contains('hidden')) {
+    classManagerModal.classList.add('hidden');
+  }
+  
   document.getElementById('themeClassName').textContent = className;
   document.getElementById('previewClassName').textContent = className;
   
