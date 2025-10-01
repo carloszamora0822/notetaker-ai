@@ -52,7 +52,7 @@ Format Example:
 • Key point with **important term**
 • Another detail
 
-## 💡 Main Topic 2  
+## 💡 Main Topic 2
 • More information
 
 Answer:"""
@@ -125,7 +125,7 @@ def summarize_for_pdf(text: str, timeout: int = 30) -> dict:
 
     try:
         logger.info(f"🤖 Calling LLM to format {len(text)} characters...")
-        
+
         # Call Ollama with timeout
         response = ollama.chat(
             model="llama3.2:3b",
@@ -134,7 +134,7 @@ def summarize_for_pdf(text: str, timeout: int = 30) -> dict:
         )
 
         formatted = response["message"]["content"].strip()
-        
+
         # Validate output
         if not formatted or len(formatted) < len(text) * 0.5:
             logger.warning(f"⚠️ LLM output too short ({len(formatted)} chars vs {len(text)} original)")
@@ -144,7 +144,7 @@ def summarize_for_pdf(text: str, timeout: int = 30) -> dict:
                 "used_llm": False,
                 "error": "Output too short, using original"
             }
-        
+
         logger.info(f"✅ LLM formatting successful: {len(text)} → {len(formatted)} chars")
         return {
             "formatted_text": formatted,

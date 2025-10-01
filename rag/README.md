@@ -120,10 +120,10 @@ for citation in result['citations']:
 results = search("SHPE meeting fundraiser")
 # Returns: ["VP Meeting 2... Fundraiser Ideas...", "corn fundraiser...", ...]
 
-# With synthesis  
+# With synthesis
 result = search_with_synthesis("What fundraiser ideas were discussed?")
-# Returns: "During SHPE VP Meeting 4, the committee brainstormed several 
-#           fundraising options including a corn fundraiser and raspados 
+# Returns: "During SHPE VP Meeting 4, the committee brainstormed several
+#           fundraising options including a corn fundraiser and raspados
 #           (shaved ice) sales. Both ideas were well-received by the team..."
 ```
 

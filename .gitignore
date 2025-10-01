@@ -88,7 +88,6 @@ dmypy.json
 *.md
 
 # But keep important docs
-!README.md
 !requirements.txt
 
 # Large model files (download separately)
