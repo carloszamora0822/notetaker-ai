@@ -55,8 +55,10 @@ METHOD 3: Manual
 🔧 USEFUL COMMANDS
 --------------------------------------------------------------------------------
    make start           Start everything
-   make stop            Stop all services
+   make stop            Stop all services (kills Ollama + Backend)
    make restart         Restart everything
+   make ps              Check what's running
+   make clean           Nuclear option - kill EVERYTHING
    make check-ollama    Check if Ollama is working
    make fix-ollama      Install LLM model
    make db-health       Check database status

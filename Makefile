@@ -85,17 +85,41 @@ db-cleanup: ## Clean up orphaned vectors
 start: ## Start everything (Ollama + Backend + Browser)
 	@bash start.sh
 
-stop: ## Stop all services
+stop: ## Stop all services (kills everything)
 	@echo "🛑 Stopping Notetaker AI..."
 	@echo ""
 	@echo "Killing processes:"
-	@pkill -f "uvicorn backend.main" && echo "  ✓ Backend server stopped" || echo "  - Backend not running"
-	@pkill -f "ollama serve" && echo "  ✓ Ollama stopped" || echo "  - Ollama not running"
+	@pkill -9 -f "uvicorn backend.main" && echo "  ✓ Backend server killed" || echo "  - Backend not running"
+	@pkill -9 -f "ollama serve" && echo "  ✓ Ollama killed" || echo "  - Ollama not running"
+	@pkill -9 -f "ollama" && echo "  ✓ Any other Ollama processes killed" || true
+	@lsof -ti:8000 | xargs kill -9 2>/dev/null && echo "  ✓ Port 8000 freed" || true
+	@lsof -ti:11434 | xargs kill -9 2>/dev/null && echo "  ✓ Port 11434 freed (Ollama)" || true
 	@echo ""
-	@echo "✅ All services stopped - RAM freed!"
+	@echo "✅ Everything stopped - All processes killed!"
+	@echo "💾 RAM freed: ~500MB"
 	@echo "💡 Restart with: make start"
 
 restart: stop start ## Restart everything
+
+ps: ## Show what's running (check for background processes)
+	@echo "🔍 Checking for running processes..."
+	@echo ""
+	@pgrep -fl "uvicorn|ollama" || echo "✅ No background processes found"
+	@echo ""
+	@echo "Port 8000 (Backend):"
+	@lsof -ti:8000 && echo "  ⚠️  Port 8000 is in use" || echo "  ✅ Port 8000 is free"
+	@echo "Port 11434 (Ollama):"
+	@lsof -ti:11434 && echo "  ⚠️  Port 11434 is in use" || echo "  ✅ Port 11434 is free"
+
+clean: stop ## Nuclear option - kill everything and clean up
+	@echo "💣 Nuclear cleanup..."
+	@pkill -9 -f "uvicorn" 2>/dev/null || true
+	@pkill -9 -f "ollama" 2>/dev/null || true
+	@pkill -9 -f "python.*backend" 2>/dev/null || true
+	@killall -9 ollama 2>/dev/null || true
+	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
+	@lsof -ti:11434 | xargs kill -9 2>/dev/null || true
+	@echo "✅ Nuclear cleanup complete - nothing left running!"
 
 check-ollama: ## Check Ollama service and models
 	@bash ops/scripts/check_ollama.sh
