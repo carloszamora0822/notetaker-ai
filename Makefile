@@ -95,10 +95,14 @@ start: ## Start everything (Ollama + Backend + Browser)
 	@bash start.sh
 
 stop: ## Stop all services
-	@echo "🛑 Stopping all services..."
-	@pkill -f "uvicorn backend.main" || true
-	@pkill -f "ollama serve" || true
-	@echo "✅ All services stopped"
+	@echo "🛑 Stopping Notetaker AI..."
+	@echo ""
+	@echo "Killing processes:"
+	@pkill -f "uvicorn backend.main" && echo "  ✓ Backend server stopped" || echo "  - Backend not running"
+	@pkill -f "ollama serve" && echo "  ✓ Ollama stopped" || echo "  - Ollama not running"
+	@echo ""
+	@echo "✅ All services stopped - RAM freed!"
+	@echo "💡 Restart with: make start"
 
 restart: stop start ## Restart everything
 

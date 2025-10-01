@@ -15,10 +15,11 @@ METHOD 1: From Terminal
    ✓ Open browser to http://localhost:8000/upload
 
 
-METHOD 2: Desktop App (Double-Click)
-   1. Run once: ./create-app.sh
-   2. Double-click "Notetaker AI.app" on your Desktop
-   3. Or drag to Dock for quick access
+METHOD 2: Desktop Shortcuts (Recommended!)
+   START:  Double-click "start-notetaker.command"
+   STOP:   Double-click "stop-notetaker.command"
+   
+   Both are on your Desktop - drag to Dock for quick access!
 
 
 METHOD 3: Manual
@@ -27,11 +28,13 @@ METHOD 3: Manual
    Browser:    http://localhost:8000/upload
 
 
-🛑 STOPPING EVERYTHING
+🛑 STOPPING EVERYTHING (Save RAM!)
 --------------------------------------------------------------------------------
-   $ make stop
+   Desktop:   Double-click "stop-notetaker.command"
+   Terminal:  $ make stop
+   Alias:     $ notes-stop
 
-   Kills both Ollama and backend server.
+   Kills both Ollama and backend. Frees up ~500MB RAM!
 
 
 🔄 RESTARTING
@@ -85,17 +88,17 @@ Problem: PDF not formatted nicely
 
 📊 WORKFLOW
 --------------------------------------------------------------------------------
-1. Start:  make start
+1. Start:  Double-click "start-notetaker.command" (or: make start)
 2. Upload: Go to /upload, select class, upload notes
 3. PDFs:   Auto-generated with AI formatting
 4. Search: Go to /search, ask questions about your notes
-5. Stop:   make stop (when done)
+5. Stop:   Double-click "stop-notetaker.command" (or: make stop)
 
 
 🎯 DAILY USE
 --------------------------------------------------------------------------------
 Morning:
-   $ make start                    # Opens browser automatically
+   Double-click "start-notetaker.command"    # Opens browser automatically
 
 During Day:
    - Upload notes as you take them
@@ -103,7 +106,9 @@ During Day:
    - Search when studying
 
 Evening:
-   $ make stop                     # Clean shutdown
+   Double-click "stop-notetaker.command"     # Saves RAM (~500MB freed!)
+
+💡 Tip: Drag both .command files to your Dock for one-click access!
 
 
 ================================================================================
