@@ -51,9 +51,9 @@ def check_latex_queue():
 
 def check_backend_endpoints():
     """Verify backend defines required files"""
-    backend_file = Path("backend/app/main.py")
+    backend_file = Path("backend/main.py")
     if not backend_file.exists():
-        print("❌ backend/app/main.py not found")
+        print("❌ backend/main.py not found")
         return False
 
     content = backend_file.read_text()

@@ -1,0 +1,30 @@
+timezone: "America/Chicago"
+offline_mode: true
+ram_budget_gb: 10
+
+paths:
+  inbox_global: "./inbox"
+  semesters_root: "./semesters"
+  models_root: "./rag/models"
+  latex_queue: "./latex/queue"
+  latex_output: "./latex/output"
+
+embeddings:
+  model_path: "./rag/models/bge-small-en-v1.5"
+  chunk_tokens: 900
+  overlap_tokens: 120
+
+rag:
+  top_k: 8
+  with_reranker: false
+  model_path: "./rag/models/bge-small-en-v1.5"
+  chunk_size: 500
+  chunk_overlap: 50
+  index_path: "./rag/index/chroma"
+  collection_name: "notes"
+  max_results: 8
+
+latex:
+  engine: "xelatex"
+  compile_cmd: "latexmk -xelatex -halt-on-error -interaction=nonstopmode"
+  template: "default"

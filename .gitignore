@@ -1,0 +1,84 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+ENV/
+
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.pdf
+
+# Keep example PDFs in docs
+!docs/**/*.pdf
+
+# Logs
+logs/*.log
+logs/*.json
+*.log
+
+# Vector store data
+rag/index/chroma/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+.~*
+
+# Node modules (if any frontend tooling added later)
+node_modules/
+
+# Inbox (user data)
+inbox/*
+!inbox/.gitkeep
+
+# Semesters (user data)
+semesters/*
+!semesters/.gitkeep
+
+# LaTeX output
+latex/output/*.pdf
+latex/queue/*.json
+
+# Keep template PDFs as examples
+!latex/templates/*.pdf
+
+# Pytest cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MyPy cache
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff cache
+.ruff_cache/
+
+# Pre-commit
+.pre-commit-config.yaml.swp

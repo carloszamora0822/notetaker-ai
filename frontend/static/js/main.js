@@ -42,36 +42,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const query = document.getElementById('query').value;
       const scope = document.getElementById('scope').value;
+      const resultsDiv = document.getElementById('results');
+
+      // Show loading state
+      resultsDiv.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>🤔 Thinking and analyzing your notes...</p>
+        </div>
+      `;
 
       try {
         const response = await fetch('/rag/query', {
           method: 'POST',
-          headers: {'Content-Type': 'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ q: query, scope: scope })
         });
 
-        const result = await response.json();
+        const data = await response.json();
 
-        // Display answer
-        const answerDiv = document.querySelector('.answer');
-        const answerText = document.getElementById('answerText');
-        answerText.textContent = result.answer;
-        answerDiv.classList.remove('hidden');
+        // Show synthesized answer
+        resultsDiv.innerHTML = `
+          <div class="answer">
+            <h3>Answer</h3>
+            <p>${data.answer}</p>
+            ${data.synthesized ? '<span class="badge">✨ AI-Enhanced</span>' : ''}
+          </div>
+          <div class="sources">
+            <h3>Sources (${data.num_sources || data.citations.length})</h3>
+            ${data.citations.map(c => `
+              <div class="source">
+                <strong>${c.citation}</strong>: ${c.chunk.substring(0, 150)}...
+              </div>
+            `).join('')}
+          </div>
+        `;
 
-        // Display citations
-        const citationsDiv = document.querySelector('.citations');
-        const citationList = document.getElementById('citationList');
-        citationList.innerHTML = '';
-
-        result.citations.forEach(cite => {
-          const li = document.createElement('li');
-          li.innerHTML = `<strong>${cite.citation}</strong>: ${cite.chunk.substring(0, 100)}... (score: ${cite.score.toFixed(2)})`;
-          citationList.appendChild(li);
-        });
-
-        citationsDiv.classList.remove('hidden');
       } catch (error) {
-        alert('Search failed: ' + error.message);
+        resultsDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
       }
     });
   }
