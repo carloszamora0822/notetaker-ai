@@ -157,6 +157,64 @@ footer {
 
 .answer h3 {
   margin-top: 0;
+  display: inline-block;
+}
+
+/* Styled answer content */
+.answer-content {
+  margin-top: 15px;
+  line-height: 1.8;
+  font-size: 15px;
+}
+
+.answer-content h3 {
+  color: #0B72B9;
+  font-size: 18px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  border-left: 4px solid #0B72B9;
+  padding-left: 12px;
+}
+
+.answer-content h4 {
+  color: #555;
+  font-size: 16px;
+  margin-top: 15px;
+  margin-bottom: 8px;
+}
+
+.answer-content ul {
+  margin: 10px 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.answer-content li {
+  margin: 8px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.answer-content li:before {
+  content: "▸";
+  position: absolute;
+  left: 0;
+  color: #0B72B9;
+  font-weight: bold;
+}
+
+.answer-content strong {
+  color: #0B72B9;
+  font-weight: 600;
+}
+
+.answer-content em {
+  color: #666;
+  font-style: italic;
+}
+
+.answer-content p {
+  margin: 12px 0;
   color: #0B72B9;
 }
 

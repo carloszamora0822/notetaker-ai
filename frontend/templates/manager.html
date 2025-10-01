@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/manager.css">
+
+<div class="manager-container">
+  <h1>📚 Note Manager</h1>
+  
+  <div class="file-list" id="fileList">
+    <div class="loading">Loading...</div>
+  </div>
+</div>
+
+<!-- Modal for viewing/editing -->
+<div id="viewerModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 id="viewerTitle">File</h2>
+      <button class="close-btn" onclick="closeViewer()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="fileContent" rows="20"></textarea>
+      <iframe id="pdfViewer" class="hidden" width="100%" height="600px"></iframe>
+    </div>
+    <div class="modal-footer">
+      <button onclick="deleteFile()" class="btn-danger">🗑️ Delete</button>
+      <button onclick="viewPDF()" id="viewPdfBtn">📄 View PDF</button>
+      <button onclick="closeViewer()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/manager.js"></script>
+{% endblock %}
