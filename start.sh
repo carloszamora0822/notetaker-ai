@@ -65,13 +65,23 @@ else
     
     # Wait for backend to start
     echo "   Waiting for backend to start..."
+    BACKEND_STARTED=false
     for i in {1..15}; do
         if curl -s http://localhost:8000/health > /dev/null 2>&1; then
             echo -e "${GREEN}   ✅ Backend started!${NC}"
+            BACKEND_STARTED=true
             break
         fi
+        printf "."
         sleep 1
     done
+    echo ""
+    
+    if [ "$BACKEND_STARTED" = false ]; then
+        echo -e "${RED}   ❌ Backend failed to start${NC}"
+        echo "   Check logs: tail -f logs/backend.log"
+        exit 1
+    fi
 fi
 
 echo ""

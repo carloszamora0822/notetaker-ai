@@ -31,16 +31,7 @@ start: ## Start all services in background (one command!)
 	@echo "   📊 Status: make status"
 	@echo "   🛑 Stop: make stop"
 
-stop: ## Stop all running services
-	@echo "🛑 Stopping services..."
-	@if [ -f logs/backend.pid ]; then \
-		kill $$(cat logs/backend.pid) 2>/dev/null && echo "✅ Backend stopped" || echo "⚠️  Backend not running"; \
-		rm -f logs/backend.pid; \
-	else \
-		echo "⚠️  No backend PID file found"; \
-	fi
-	@lsof -ti:8000 | xargs kill -9 2>/dev/null || true
-	@echo "✅ All services stopped"
+# Note: stop target is defined later in file with improved functionality
 
 restart: stop start ## Restart all services
 
