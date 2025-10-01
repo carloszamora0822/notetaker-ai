@@ -1,6 +1,29 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>notetaker-ai</title></head>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}notetaker-ai{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
 <body>
-<h1>notetaker-ai</h1>
-{% block content %}{% endblock %}
-</body></html>
+  <header>
+    <h1>📚 notetaker-ai</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/upload">Upload</a>
+      <a href="/search">Search</a>
+    </nav>
+  </header>
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>Offline-first AI note taking</p>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>

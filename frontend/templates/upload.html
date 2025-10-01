@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Notes - notetaker-ai{% endblock %}
+
+{% block content %}
+<section class="upload">
+  <h2>Upload Class Notes</h2>
+
+  <form id="uploadForm" action="/ingest" method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="file">Select file (.txt, .md, .pdf)</label>
+      <input type="file" id="file" name="file" required>
+    </div>
+
+    <div class="form-group">
+      <label for="class_code">Class Code (optional)</label>
+      <input type="text" id="class_code" name="class_code" placeholder="e.g., CS101">
+    </div>
+
+    <button type="submit">Upload</button>
+  </form>
+
+  <div id="uploadStatus" class="status hidden"></div>
+</section>
+{% endblock %}
