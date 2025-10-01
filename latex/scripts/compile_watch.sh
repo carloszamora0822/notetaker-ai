@@ -98,19 +98,19 @@ EOF
 echo "[LaTeX] Watcher started. Monitoring ${QUEUE_DIR}/ for input files..."
 
 while true; do
-  # Process queue
   process_queue
 
   # Update status file
   queue_size=$(ls "$QUEUE_DIR"/*_input.json 2>/dev/null | wc -l | tr -d ' ')
   timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  last_pdf=$(ls -t "$OUTPUT_DIR"/*.pdf 2>/dev/null | head -1 | xargs basename 2>/dev/null || echo "none")
 
   cat > "${LOGS_DIR}/latex_status.json" << EOF
 {
   "timestamp": "${timestamp}",
   "watcher_running": true,
   "queue_size": ${queue_size},
-  "last_compile": {"file": "monitoring", "success": true}
+  "last_compile": {"file": "${last_pdf}", "success": true}
 }
 EOF
 
