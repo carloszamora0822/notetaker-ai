@@ -91,6 +91,17 @@ db-cleanup: ## Clean up orphaned vectors
 	@echo "🧹 Cleaning up orphaned vectors..."
 	$(BIN)/python ops/scripts/cleanup_orphans.py
 
+start: ## Start everything (Ollama + Backend + Browser)
+	@bash start.sh
+
+stop: ## Stop all services
+	@echo "🛑 Stopping all services..."
+	@pkill -f "uvicorn backend.main" || true
+	@pkill -f "ollama serve" || true
+	@echo "✅ All services stopped"
+
+restart: stop start ## Restart everything
+
 check-ollama: ## Check Ollama service and models
 	@bash ops/scripts/check_ollama.sh
 

@@ -1,0 +1,111 @@
+================================================================================
+                         NOTETAKER AI - QUICK START                         
+================================================================================
+
+⚡ ONE-COMMAND STARTUP
+--------------------------------------------------------------------------------
+
+METHOD 1: From Terminal
+   $ make start
+
+   This will:
+   ✓ Start Ollama (if not running)
+   ✓ Check/install LLM model
+   ✓ Start backend server
+   ✓ Open browser to http://localhost:8000/upload
+
+
+METHOD 2: Desktop App (Double-Click)
+   1. Run once: ./create-app.sh
+   2. Double-click "Notetaker AI.app" on your Desktop
+   3. Or drag to Dock for quick access
+
+
+METHOD 3: Manual
+   Terminal 1: $ ollama serve
+   Terminal 2: $ make dev
+   Browser:    http://localhost:8000/upload
+
+
+🛑 STOPPING EVERYTHING
+--------------------------------------------------------------------------------
+   $ make stop
+
+   Kills both Ollama and backend server.
+
+
+🔄 RESTARTING
+--------------------------------------------------------------------------------
+   $ make restart
+
+   Stops everything and starts fresh.
+
+
+📍 MAIN URLS
+--------------------------------------------------------------------------------
+   Upload Notes:    http://localhost:8000/upload
+   Search Notes:    http://localhost:8000/search  
+   Manage Files:    http://localhost:8000/manager
+   Theme Editor:    http://localhost:8000/theme-editor
+
+
+🔧 USEFUL COMMANDS
+--------------------------------------------------------------------------------
+   make start           Start everything
+   make stop            Stop all services
+   make restart         Restart everything
+   make check-ollama    Check if Ollama is working
+   make fix-ollama      Install LLM model
+   make db-health       Check database status
+   make db-cleanup      Clean orphaned vectors
+   make test            Run quick test
+
+
+💡 FIRST TIME SETUP
+--------------------------------------------------------------------------------
+1. Install Ollama:    brew install ollama
+2. Install model:     make fix-ollama
+3. Start app:         make start
+
+
+🐛 TROUBLESHOOTING
+--------------------------------------------------------------------------------
+Problem: Port 8000 already in use
+   Solution: make stop
+
+Problem: Ollama not running
+   Solution: make check-ollama
+
+Problem: No LLM model
+   Solution: make fix-ollama
+
+Problem: PDF not formatted nicely
+   Solution: Check http://localhost:8000/api/health/ollama
+
+
+📊 WORKFLOW
+--------------------------------------------------------------------------------
+1. Start:  make start
+2. Upload: Go to /upload, select class, upload notes
+3. PDFs:   Auto-generated with AI formatting
+4. Search: Go to /search, ask questions about your notes
+5. Stop:   make stop (when done)
+
+
+🎯 DAILY USE
+--------------------------------------------------------------------------------
+Morning:
+   $ make start                    # Opens browser automatically
+
+During Day:
+   - Upload notes as you take them
+   - PDFs saved in latex/output/
+   - Search when studying
+
+Evening:
+   $ make stop                     # Clean shutdown
+
+
+================================================================================
+                            Happy Note Taking! 📚                            
+================================================================================
