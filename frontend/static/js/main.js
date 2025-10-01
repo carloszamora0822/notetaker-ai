@@ -61,7 +61,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (response.ok) {
           statusDiv.className = 'status success';
-          statusDiv.textContent = `✓ Uploaded successfully! Stored at: ${result.stored}`;
+          
+          // Build success message
+          let message = '✓ Uploaded successfully!';
+          if (result.pdf_url) {
+            message += ` <a href="${result.pdf_url}" target="_blank" class="pdf-link">📝 View PDF</a>`;
+          }
+          if (result.formatted) {
+            message += ' <span class="badge">✨ AI-formatted</span>';
+          }
+          
+          statusDiv.innerHTML = message;
           uploadForm.reset();
           // Hide new class input after successful upload
           document.getElementById('new_class_code').classList.add('hidden');
@@ -107,22 +117,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const data = await response.json();
 
-        // Show synthesized answer
-        const formattedAnswer = markdownToHtml(data.answer);
-        resultsDiv.innerHTML = `
-          <div class="answer">
-            <h3>Answer ${data.synthesized ? '<span class="badge">✨ AI-Enhanced</span>' : ''}</h3>
-            <div class="answer-content">${formattedAnswer}</div>
-          </div>
-          <div class="sources">
-            <h3>Sources (${data.num_sources || data.citations.length})</h3>
-            ${data.citations.map(c => `
-              <div class="source">
-                <strong>${c.citation}</strong>: ${c.chunk.substring(0, 150)}...
-              </div>
-            `).join('')}
-          </div>
-        `;
+        // Check if we have categorized results
+        if (data.by_class && Object.keys(data.by_class).length > 0) {
+          displayCategorizedResults(data);
+        } else {
+          // Show traditional synthesized answer
+          const formattedAnswer = markdownToHtml(data.answer);
+          resultsDiv.innerHTML = `
+            <div class="answer">
+              <h3>Answer ${data.synthesized ? '<span class="badge">✨ AI-Enhanced</span>' : ''}</h3>
+              <div class="answer-content">${formattedAnswer}</div>
+            </div>
+            <div class="sources">
+              <h3>Sources (${data.num_sources || data.citations.length})</h3>
+              ${data.citations.map(c => `
+                <div class="source">
+                  <strong>${c.citation}</strong>: ${c.chunk.substring(0, 150)}...
+                </div>
+              `).join('')}
+            </div>
+          `;
+        }
 
       } catch (error) {
         resultsDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
@@ -130,6 +145,42 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 });
+
+// Display categorized search results grouped by class
+function displayCategorizedResults(data) {
+  const resultsDiv = document.getElementById('results');
+  
+  // Show answer first
+  const formattedAnswer = markdownToHtml(data.answer);
+  let html = `
+    <div class="answer">
+      <h3>Answer ${data.synthesized ? '<span class="badge">✨ AI-Enhanced</span>' : ''}</h3>
+      <div class="answer-content">${formattedAnswer}</div>
+    </div>
+  `;
+  
+  // Show results grouped by class
+  html += '<div class="sources-categorized"><h3>Sources by Class</h3>';
+  for (const [cls, results] of Object.entries(data.by_class)) {
+    html += `
+      <div class="class-group">
+        <h4>${cls} (${results.length} result${results.length !== 1 ? 's' : ''})</h4>
+        ${results.map(r => `
+          <div class="source">
+            <div class="source-header">
+              <strong>${r.source}</strong>
+              <span class="score">${(r.score * 100).toFixed(0)}%</span>
+            </div>
+            <p>${r.chunk}</p>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+  html += '</div>';
+  
+  resultsDiv.innerHTML = html;
+}
 
 // Load classes into search scope dropdown
 async function loadClassesForSearch() {
@@ -146,7 +197,7 @@ async function loadClassesForSearch() {
     // Add class options
     classes.forEach(className => {
       const option = document.createElement('option');
-      option.value = className.toLowerCase();
+      option.value = className;  // Keep original case
       option.textContent = className;
       scopeSelect.appendChild(option);
     });

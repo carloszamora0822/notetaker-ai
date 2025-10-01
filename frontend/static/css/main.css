@@ -222,19 +222,41 @@ button:hover {
 }
 
 .status {
-  margin-top: 1rem;
   padding: 1rem;
   border-radius: 4px;
+  margin-top: 1rem;
 }
 
 .status.success {
   background: #d4edda;
   color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.status.success .pdf-link {
+  color: #0B72B9;
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.status.success .pdf-link:hover {
+  text-decoration: underline;
+}
+
+.status.success .badge {
+  background: #ffc107;
+  color: #333;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-left: 8px;
 }
 
 .status.error {
   background: #f8d7da;
   color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 footer {
@@ -381,6 +403,69 @@ footer {
   padding: 1rem;
   border-radius: 4px;
   margin-top: 1rem;
+}
+
+/* Categorized search results */
+.sources-categorized {
+  margin-top: 20px;
+}
+
+.sources-categorized h3 {
+  color: #0B72B9;
+  margin-bottom: 20px;
+}
+
+.class-group {
+  background: white;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border-left: 4px solid #0B72B9;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.class-group h4 {
+  color: #333;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.class-group .source {
+  margin-bottom: 15px;
+  border-left: 3px solid #ddd;
+}
+
+.class-group .source:last-child {
+  margin-bottom: 0;
+}
+
+.source-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.source-header strong {
+  color: #0B72B9;
+  display: inline;
+  margin: 0;
+}
+
+.source-header .score {
+  background: #e3f2fd;
+  color: #0B72B9;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.class-group .source p {
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
 }
 
 /* Responsive design */
