@@ -11,8 +11,19 @@
   margin-bottom: 30px;
 }
 
+.manager-header .header-text {
+  flex: 1;
+}
+
 .manager-header h1 {
+  margin: 0 0 5px 0;
+  color: #333;
+}
+
+.manager-header .subtitle {
   margin: 0;
+  color: #666;
+  font-size: 16px;
 }
 
 .file-list {

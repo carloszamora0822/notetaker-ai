@@ -3,8 +3,11 @@
 {% block title %}Upload Notes - notetaker-ai{% endblock %}
 
 {% block content %}
-<section class="upload">
-  <h2>Upload Class Notes</h2>
+<div class="upload-container">
+  <div class="upload-header">
+    <h1>📊 Upload Notes</h1>
+    <p class="subtitle">Add your class notes and materials to the system</p>
+  </div>
 
   <form id="uploadForm" action="/ingest" method="POST" enctype="multipart/form-data">
     <div class="form-group">
@@ -36,5 +39,5 @@
   </form>
 
   <div id="uploadStatus" class="status hidden"></div>
-</section>
+</div>
 {% endblock %}
