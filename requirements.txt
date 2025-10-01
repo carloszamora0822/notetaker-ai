@@ -1,0 +1,28 @@
+# Web Framework
+fastapi==0.115.0
+uvicorn[standard]==0.32.0
+jinja2==3.1.4
+python-multipart==0.0.12
+aiofiles==24.1.0
+
+# RAG & Embeddings
+langchain==0.3.7
+langchain-community==0.3.5
+chromadb==0.5.20
+sentence-transformers==3.3.1
+
+# Local LLM
+ollama==0.4.4
+
+# Code Quality
+black==24.10.0
+flake8==7.1.1
+isort==5.13.2
+ruff==0.8.2
+
+# Testing
+pytest==8.3.3
+pytest-asyncio==0.24.0
+
+# Utilities
+pyyaml==6.0.2

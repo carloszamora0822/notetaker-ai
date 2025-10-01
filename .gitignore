@@ -82,3 +82,11 @@ dmypy.json
 
 # Pre-commit
 .pre-commit-config.yaml.swp
+
+# Ignore note files and documentation
+*.txt
+*.md
+
+# But keep important docs
+!README.md
+!requirements.txt

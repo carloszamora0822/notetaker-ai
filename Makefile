@@ -82,3 +82,20 @@ quick-test: ## Quick test after startup
 	@rm -f /tmp/test_note.txt
 	@echo ""
 	@echo "✅ Quick test complete!"
+
+db-health: ## Check vector database health
+	@echo "🏥 Checking Vector Database Health..."
+	@curl -s http://localhost:8000/api/health/vectordb | jq '.' || echo "❌ Backend not running"
+
+db-cleanup: ## Clean up orphaned vectors
+	@echo "🧹 Cleaning up orphaned vectors..."
+	$(BIN)/python ops/scripts/cleanup_orphans.py
+
+check-ollama: ## Check Ollama service and models
+	@bash ops/scripts/check_ollama.sh
+
+fix-ollama: ## Install recommended model (llama3.2:3b)
+	@echo "📦 Installing llama3.2:3b (recommended)..."
+	ollama pull llama3.2:3b
+	@echo "✅ Model installed!"
+	@echo "💡 Run 'make check-ollama' to verify"

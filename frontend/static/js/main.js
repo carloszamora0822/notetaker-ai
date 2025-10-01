@@ -64,11 +64,17 @@ document.addEventListener('DOMContentLoaded', () => {
           
           // Build success message
           let message = '✓ Uploaded successfully!';
-          if (result.pdf_url) {
-            message += ` <a href="${result.pdf_url}" target="_blank" class="pdf-link">📝 View PDF</a>`;
+          
+          // Show LLM formatting status
+          if (result.llm_formatted) {
+            message += ' <span class="badge badge-success">✨ LLM Formatted</span>';
+          } else if (result.format_error) {
+            message += ` <span class="badge badge-warning">⚠️ ${result.format_error}</span>`;
           }
-          if (result.formatted) {
-            message += ' <span class="badge">✨ AI-formatted</span>';
+          
+          // Show PDF link
+          if (result.pdf_url) {
+            message += ` <a href="${result.pdf_url}" target="_blank" class="pdf-link">📄 View PDF</a>`;
           }
           
           statusDiv.innerHTML = message;
