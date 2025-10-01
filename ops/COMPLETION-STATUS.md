@@ -1,7 +1,7 @@
 # OPS Developer - Completion Status
 
-**Date**: 2025-09-30  
-**Developer**: OPS  
+**Date**: 2025-09-30
+**Developer**: OPS
 **Reference**: `ops/README-DEV.md`
 
 ---

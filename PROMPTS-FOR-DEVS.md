@@ -36,12 +36,12 @@ class QueryRequest(BaseModel):
 @app.post("/rag/query")
 async def rag_query(request: QueryRequest):
     """RAG query endpoint - Sprint 0 stub
-    
+
     TODO: Call rag.search() in Sprint 1
     """
     global request_counter
     request_counter += 1
-    
+
     return {
         "answer": "Not implemented yet",
         "citations": []

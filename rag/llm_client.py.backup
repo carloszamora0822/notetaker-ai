@@ -1,0 +1,164 @@
+"""LLM client for synthesizing RAG results into coherent answers"""
+import logging
+from typing import Dict, List
+
+import ollama
+import requests
+
+logger = logging.getLogger(__name__)
+
+
+def get_available_models() -> List[str]:
+    """Get list of available Ollama models"""
+        chunks: List of retrieved chunks with metadata
+        max_tokens: Maximum length of generated answer
+
+    Returns:
+        Synthesized answer string
+    """
+    if not chunks:
+        return "I couldn't find any relevant information in your notes."
+
+    # Build context from chunks
+    context = "\n\n".join(
+        [f"[{chunk['citation']}]: {chunk['chunk']}" for chunk in chunks[:5]]  # Use top 5 chunks
+    )
+
+    # Create prompt
+    prompt = f"""You are an AI assistant helping a student review their notes.
+
+User's Question: {query}
+
+Relevant Notes:
+{context}
+
+Instructions:
+1. Answer the user's question based ONLY on the notes provided
+2. Use markdown formatting with structure:
+   - Start with a brief 1-sentence overview
+   - Use ## headings for main topics
+   - Use emojis to make it engaging (📚 🎯 💡 📝 ⚡ 🔍 etc.)
+   - Use bullet points (•) or numbered lists
+   - Use **bold** for key terms or names
+   - Keep it concise (2-4 short sections)
+3. If the notes mention specific dates, people, or events, highlight them with **bold**
+4. If the notes don't fully answer the question, say so at the end
+5. Use a friendly, conversational tone
+
+Format Example:
+📚 Brief one-sentence summary here.
+
+## 🎯 Main Topic 1
+• Key point with **important term**
+• Another detail
+
+## 💡 Main Topic 2  
+• More information
+
+Answer:"""
+
+    try:
+        # Call Ollama
+        response = ollama.generate(
+            model="mistral",
+            prompt=prompt,
+            options={
+                "temperature": 0.7,
+                "num_predict": max_tokens,
+            },
+        )
+
+        answer = response["response"].strip()
+        logger.info(f"LLM synthesis complete: {len(answer)} chars")
+        return answer
+
+    except Exception as e:
+        logger.error(f"LLM synthesis failed: {e}")
+        # Fallback to simple concatenation
+        return (
+            f"Found {len(chunks)} relevant notes:\n\n"
+            + "\n\n".join([f"• {c['chunk'][:200]}..." for c in chunks[:3]])
+        )
+
+
+def summarize_for_pdf(text: str, timeout: int = 30) -> dict:
+    """
+    Clean and format text for PDF generation.
+    Maintains ALL information but improves readability.
+
+    Args:
+        text: Raw note content
+        timeout: Maximum seconds to wait for LLM
+
+    Returns:
+        {
+            "formatted_text": str,
+            "success": bool,
+            "used_llm": bool,
+            "error": str | None
+        }
+    """
+    if not text or not text.strip():
+        logger.warning("Empty text provided for summarization")
+        return {
+            "formatted_text": text,
+            "success": False,
+            "used_llm": False,
+            "error": "Empty input"
+        }
+
+    prompt = f"""You are a professional note formatter. Format these student notes for a PDF document.
+
+**CRITICAL RULES:**
+1. PRESERVE ALL INFORMATION - Do not delete or summarize anything
+2. Fix typos and grammar
+3. Organize with clear headers using # for sections
+4. Use bullet points (- ) for lists
+5. Use **bold** for important terms
+6. Add blank lines between sections
+7. Keep all dates, names, and specific details
+
+**Raw Notes:**
+{text}
+
+**Your Formatted Output (markdown style):**"""
+
+    try:
+        logger.info(f"🤖 Calling LLM to format {len(text)} characters...")
+        
+        # Call Ollama with timeout
+        response = ollama.chat(
+            model="llama3.2:3b",
+            messages=[{"role": "user", "content": prompt}],
+            options={"temperature": 0.3}  # Lower temp for more consistent formatting
+        )
+
+        formatted = response["message"]["content"].strip()
+        
+        # Validate output
+        if not formatted or len(formatted) < len(text) * 0.5:
+            logger.warning(f"⚠️ LLM output too short ({len(formatted)} chars vs {len(text)} original)")
+            return {
+                "formatted_text": text,
+                "success": False,
+                "used_llm": False,
+                "error": "Output too short, using original"
+            }
+        
+        logger.info(f"✅ LLM formatting successful: {len(text)} → {len(formatted)} chars")
+        return {
+            "formatted_text": formatted,
+            "success": True,
+            "used_llm": True,
+            "error": None
+        }
+
+    except Exception as e:
+        error_msg = f"LLM formatting failed: {str(e)}"
+        logger.error(f"❌ {error_msg}")
+        return {
+            "formatted_text": text,
+            "success": False,
+            "used_llm": False,
+            "error": error_msg
+        }

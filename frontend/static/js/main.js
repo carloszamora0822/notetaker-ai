@@ -29,22 +29,22 @@ document.addEventListener('DOMContentLoaded', () => {
   if (uploadForm) {
     // Load classes for dropdown
     loadClassesForUpload();
-    
+
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const formData = new FormData();
       const file = document.getElementById('file').files[0];
-      
+
       // Use new class input if filled, otherwise use dropdown
       let classCode = document.getElementById('new_class_code').value.trim();
       if (!classCode) {
         classCode = document.getElementById('class_code').value;
       }
-      
+
       formData.append('file', file);
       formData.append('class_code', classCode);
-      
+
       const statusDiv = document.getElementById('uploadStatus');
 
       statusDiv.className = 'status';
@@ -61,22 +61,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (response.ok) {
           statusDiv.className = 'status success';
-          
+
           // Build success message
           let message = '✓ Uploaded successfully!';
-          
+
           // Show LLM formatting status
           if (result.llm_formatted) {
             message += ' <span class="badge badge-success">✨ LLM Formatted</span>';
           } else if (result.format_error) {
             message += ` <span class="badge badge-warning">⚠️ ${result.format_error}</span>`;
           }
-          
+
           // Show PDF link
           if (result.pdf_url) {
             message += ` <a href="${result.pdf_url}" target="_blank" class="pdf-link">📄 View PDF</a>`;
           }
-          
+
           statusDiv.innerHTML = message;
           uploadForm.reset();
           // Hide new class input after successful upload
@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (searchForm) {
     // Load class list for scope dropdown
     loadClassesForSearch();
-    
+
     searchForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Display categorized search results grouped by class
 function displayCategorizedResults(data) {
   const resultsDiv = document.getElementById('results');
-  
+
   // Show answer first
   const formattedAnswer = markdownToHtml(data.answer);
   let html = `
@@ -164,7 +164,7 @@ function displayCategorizedResults(data) {
       <div class="answer-content">${formattedAnswer}</div>
     </div>
   `;
-  
+
   // Show results grouped by class
   html += '<div class="sources-categorized"><h3>Sources by Class</h3>';
   for (const [cls, results] of Object.entries(data.by_class)) {
@@ -184,7 +184,7 @@ function displayCategorizedResults(data) {
     `;
   }
   html += '</div>';
-  
+
   resultsDiv.innerHTML = html;
 }
 
@@ -192,14 +192,14 @@ function displayCategorizedResults(data) {
 async function loadClassesForSearch() {
   const scopeSelect = document.getElementById('scope');
   if (!scopeSelect) return;
-  
+
   try {
     const response = await fetch('/api/files');
     const data = await response.json();
-    
+
     // Get unique class codes
     const classes = [...new Set(data.files.map(f => f.class_code))];
-    
+
     // Add class options
     classes.forEach(className => {
       const option = document.createElement('option');
@@ -216,14 +216,14 @@ async function loadClassesForSearch() {
 async function loadClassesForUpload() {
   const select = document.getElementById('class_code');
   if (!select) return;
-  
+
   try {
     const res = await fetch('/api/classes');
     const data = await res.json();
-    
+
     // Clear existing options except first one
     select.innerHTML = '<option value="">Select class...</option>';
-    
+
     data.classes.forEach(cls => {
       const option = document.createElement('option');
       option.value = cls.code;
@@ -239,7 +239,7 @@ async function loadClassesForUpload() {
 function showNewClassInput() {
   const select = document.getElementById('class_code');
   const newInput = document.getElementById('new_class_code');
-  
+
   if (newInput.classList.contains('hidden')) {
     newInput.classList.remove('hidden');
     newInput.focus();

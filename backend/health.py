@@ -31,7 +31,9 @@ def check_vector_db_health(base_dir: Path) -> dict:
         unique_files = set()
 
         if all_docs["metadatas"]:
-            unique_files = set(m.get("filename") for m in all_docs["metadatas"] if m.get("filename"))
+            unique_files = set(
+                m.get("filename") for m in all_docs["metadatas"] if m.get("filename")
+            )
             for filename in unique_files:
                 if not (inbox / filename).exists():
                     orphaned += 1

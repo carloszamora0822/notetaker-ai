@@ -83,7 +83,7 @@ This starts:
 - **RAG service** (background)
 - **LaTeX watcher** (background)
 
-To detach from tmux: `Ctrl+b` then `d`  
+To detach from tmux: `Ctrl+b` then `d`
 To reattach: `tmux attach -t notetaker-dev`
 
 ### Start Individual Services

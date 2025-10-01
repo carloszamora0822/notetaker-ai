@@ -1,0 +1,32 @@
+color_palette:
+  blue:
+    primary: '#0B72B9'
+    secondary: '#64B5F6'
+  green:
+    primary: '#28a745'
+    secondary: '#66bb6a'
+  orange:
+    primary: '#fd7e14'
+    secondary: '#ffa94d'
+  purple:
+    primary: '#764ba2'
+    secondary: '#9c27b0'
+  red:
+    primary: '#dc3545'
+    secondary: '#ff6b6b'
+  yellow:
+    primary: '#ffc107'
+    secondary: '#ffd43b'
+default:
+  color_name: blue
+  font_family: modern
+  primary_color: '#0B72B9'
+  secondary_color: '#64B5F6'
+TODO:
+  color_name: red
+  primary_color: '#dc3545'
+  secondary_color: '#ff6b6b'
+LATIN HERITAGE MONTH COMMITTEE:
+  color_name: red
+  primary_color: '#dc3545'
+  secondary_color: '#ff6b6b'

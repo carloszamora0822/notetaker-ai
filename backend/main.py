@@ -9,22 +9,32 @@ import yaml
 
 # Setup logging
 logger = logging.getLogger(__name__)
+# Theme and LaTeX imports
+import sys
+
 from fastapi import FastAPI, Form, HTTPException, Request, UploadFile
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
 # RAG imports
-from rag.search import index_document, search_with_synthesis
+from rag.search import index_document
 from rag.search import search as rag_search
+from rag.search import search_with_synthesis
 
-# Theme and LaTeX imports
-import sys
 sys.path.append(str(Path(__file__).resolve().parent.parent / "config"))
 from theme_manager import (
-    get_theme, save_theme, delete_theme, get_color_palette, load_themes,
-    class_exists, register_class, increment_file_count, decrement_file_count, delete_class
+    class_exists,
+    decrement_file_count,
+    delete_class,
+    delete_theme,
+    get_color_palette,
+    get_theme,
+    increment_file_count,
+    load_themes,
+    register_class,
+    save_theme,
 )
 
 sys.path.append(str(Path(__file__).resolve().parent.parent / "latex"))
@@ -69,7 +79,7 @@ def health():
 async def ollama_health():
     """Check if Ollama is available and list models"""
     import requests
-    
+
     try:
         response = requests.get("http://localhost:11434/api/tags", timeout=2)
         if response.status_code == 200:
@@ -78,28 +88,26 @@ async def ollama_health():
             return {
                 "status": "ok",
                 "service": "running",
-                "models": [{"name": m["name"], "size": m.get("size", 0)} for m in models],
-                "count": len(models)
+                "models": [
+                    {"name": m["name"], "size": m.get("size", 0)} for m in models
+                ],
+                "count": len(models),
             }
         else:
             return {
                 "status": "error",
                 "service": "unreachable",
-                "error": f"Status code: {response.status_code}"
+                "error": f"Status code: {response.status_code}",
             }
     except requests.exceptions.ConnectionError:
         return {
             "status": "error",
             "service": "not_running",
             "error": "Cannot connect to Ollama. Start with: ollama serve",
-            "fix": "Run 'ollama serve' in a separate terminal"
+            "fix": "Run 'ollama serve' in a separate terminal",
         }
     except Exception as e:
-        return {
-            "status": "error",
-            "service": "unknown",
-            "error": str(e)
-        }
+        return {"status": "error", "service": "unknown", "error": str(e)}
 
 
 @app.get("/upload", response_class=HTMLResponse)
@@ -133,7 +141,7 @@ async def list_themes():
     # Remove internal color_palette from response
     return {
         "themes": {k: v for k, v in themes.items() if k != "color_palette"},
-        "color_palette": get_color_palette()
+        "color_palette": get_color_palette(),
     }
 
 
@@ -162,20 +170,22 @@ async def list_classes():
     """Get all registered classes with metadata"""
     themes = load_themes()
     classes = []
-    
+
     for code, theme in themes.items():
-        if code in ['default', 'color_palette']:
+        if code in ["default", "color_palette"]:
             continue
-        
-        classes.append({
-            "code": code,
-            "color": theme.get('primary_color', '#0B72B9'),
-            "file_count": theme.get('file_count', 0),
-            "created_at": theme.get('created_at', None)
-        })
-    
+
+        classes.append(
+            {
+                "code": code,
+                "color": theme.get("primary_color", "#0B72B9"),
+                "file_count": theme.get("file_count", 0),
+                "created_at": theme.get("created_at", None),
+            }
+        )
+
     # Sort by creation date
-    classes.sort(key=lambda x: x['created_at'] or '', reverse=True)
+    classes.sort(key=lambda x: x["created_at"] or "", reverse=True)
     return {"classes": classes}
 
 
@@ -183,10 +193,12 @@ async def list_classes():
 async def delete_class_endpoint(class_code: str):
     """Delete class (must have 0 files)"""
     theme = get_theme(class_code)
-    
-    if theme.get('file_count', 0) > 0:
-        raise HTTPException(400, f"Cannot delete {class_code}: has {theme['file_count']} files")
-    
+
+    if theme.get("file_count", 0) > 0:
+        raise HTTPException(
+            400, f"Cannot delete {class_code}: has {theme['file_count']} files"
+        )
+
     delete_class(class_code)
     return {"success": True, "message": f"Deleted class {class_code}"}
 
@@ -207,26 +219,28 @@ async def list_files(class_code: str = None):
     inbox_path = BASE_DIR / CFG["paths"]["inbox_global"]
     if not inbox_path.exists():
         return {"files": []}
-    
+
     files = []
     for f in inbox_path.glob("*.txt"):
         parts = f.stem.split("_", 1)
         fc = parts[1] if len(parts) > 1 else "GENERAL"
         if class_code and fc != class_code:
             continue
-        
+
         pdf = BASE_DIR / "latex/output" / f"{f.stem}.pdf"
-        files.append({
-            "filename": f.name,
-            "date": parts[0],
-            "class_code": fc,
-            "size": f.stat().st_size,
-            "modified": f.stat().st_mtime,
-            "has_pdf": pdf.exists(),
-            "pdf_url": f"/pdf/{f.stem}.pdf" if pdf.exists() else None
-        })
-    
-    files.sort(key=lambda x: x['modified'], reverse=True)
+        files.append(
+            {
+                "filename": f.name,
+                "date": parts[0],
+                "class_code": fc,
+                "size": f.stat().st_size,
+                "modified": f.stat().st_mtime,
+                "has_pdf": pdf.exists(),
+                "pdf_url": f"/pdf/{f.stem}.pdf" if pdf.exists() else None,
+            }
+        )
+
+    files.sort(key=lambda x: x["modified"], reverse=True)
     return {"files": files}
 
 
@@ -236,13 +250,13 @@ async def get_file(filename: str):
     file_path = BASE_DIR / CFG["paths"]["inbox_global"] / filename
     if not file_path.exists():
         raise HTTPException(404, "File not found")
-    
+
     parts = file_path.stem.split("_", 1)
     return {
         "filename": filename,
         "content": file_path.read_text(),
         "date": parts[0],
-        "class_code": parts[1] if len(parts) > 1 else "GENERAL"
+        "class_code": parts[1] if len(parts) > 1 else "GENERAL",
     }
 
 
@@ -250,36 +264,37 @@ async def get_file(filename: str):
 async def delete_file(filename: str):
     """Delete file and all related data"""
     from rag.search import delete_document
+
     count = 0
-    
+
     # 1. Delete text file
     txt = BASE_DIR / CFG["paths"]["inbox_global"] / filename
     if txt.exists():
         txt.unlink()
         count += 1
-    
+
     # 2. Delete from RAG index (improved)
     if delete_document(filename):
         count += 1
-    
+
     # 3. Delete LaTeX template
     tex = BASE_DIR / "latex/templates" / f"{Path(filename).stem}.tex"
     if tex.exists():
         tex.unlink()
         count += 1
-    
+
     # 4. Delete PDF
     pdf = BASE_DIR / "latex/output" / f"{Path(filename).stem}.pdf"
     if pdf.exists():
         pdf.unlink()
         count += 1
-    
+
     # 5. Decrement file count for class
-    parts = filename.split('_', 1)
+    parts = filename.split("_", 1)
     if len(parts) > 1:
-        class_code = parts[1].replace('.txt', '')
+        class_code = parts[1].replace(".txt", "")
         decrement_file_count(class_code)
-    
+
     return {"success": True, "deleted_count": count}
 
 
@@ -301,15 +316,15 @@ async def ingest(file: UploadFile, class_code: str = Form("")):
     # Read file content
     content = await file.read()
     text = content.decode("utf-8")
-    
+
     # Normalize class code to UPPERCASE
     class_code = class_code.strip().upper() or "GENERAL"
-    
+
     # Auto-register class if new
     if not class_exists(class_code):
         register_class(class_code)
         logger.info(f"Auto-registered new class: {class_code}")
-    
+
     # Increment file count
     increment_file_count(class_code)
 
@@ -334,29 +349,29 @@ async def ingest(file: UploadFile, class_code: str = Form("")):
     }
 
     indexed = index_document(text, metadata)
-    
+
     # ✨ STEP 1: Format text with LLM before PDF generation
     logger.info(f"📝 Starting LLM formatting for {filename}...")
     from rag.llm_client import summarize_for_pdf
-    
+
     format_result = summarize_for_pdf(text)
     formatted_text = format_result["formatted_text"]
     llm_success = format_result["success"]
-    
+
     if llm_success:
         logger.info(f"✅ LLM formatting successful!")
     else:
         logger.warning(f"⚠️ LLM formatting failed: {format_result['error']}")
         logger.info("Using original text for PDF")
-    
+
     # ✨ STEP 2: Convert formatted text to LaTeX and compile PDF
     pdf_url = None
     try:
         import subprocess
-        
+
         # Get theme for this class
         theme = get_theme(class_code)
-        
+
         # Generate themed LaTeX with formatted content
         # is_formatted=True means content has markdown-style formatting from LLM
         logger.info(f"📄 Generating LaTeX (formatted={llm_success})...")
@@ -365,31 +380,36 @@ async def ingest(file: UploadFile, class_code: str = Form("")):
             class_code=class_code,
             date=today,
             theme=theme,
-            is_formatted=llm_success  # Only use markdown conversion if LLM succeeded
+            is_formatted=llm_success,  # Only use markdown conversion if LLM succeeded
         )
-        
+
         # Save .tex file
         tex_path = BASE_DIR / "latex/templates" / f"{file_path.stem}.tex"
         tex_path.parent.mkdir(exist_ok=True, parents=True)
         tex_path.write_text(tex_content)
-        
+
         # Compile to PDF
         output_dir = BASE_DIR / "latex/output"
         output_dir.mkdir(exist_ok=True, parents=True)
-        
+
         result = subprocess.run(
-            ["pdflatex", "-output-directory", str(output_dir), 
-             "-interaction=nonstopmode", str(tex_path)],
+            [
+                "pdflatex",
+                "-output-directory",
+                str(output_dir),
+                "-interaction=nonstopmode",
+                str(tex_path),
+            ],
             capture_output=True,
-            timeout=15
+            timeout=15,
         )
-        
+
         if result.returncode == 0:
             pdf_url = f"/pdf/{file_path.stem}.pdf"
             logger.info(f"✅ PDF generated: {pdf_url}")
         else:
             logger.error(f"LaTeX compilation failed: {result.stderr.decode()}")
-            
+
     except Exception as e:
         logger.warning(f"PDF generation failed: {e}")
 
@@ -403,8 +423,10 @@ async def ingest(file: UploadFile, class_code: str = Form("")):
         "model_used": format_result.get("model_used"),  # Show which model was used
         "help": {
             "message": "LLM formatting failed. PDF uses basic formatting.",
-            "action": "Check /api/health/ollama for Ollama status"
-        } if not llm_success and format_result.get("error") else None
+            "action": "Check /api/health/ollama for Ollama status",
+        }
+        if not llm_success and format_result.get("error")
+        else None,
     }
 
 
@@ -419,29 +441,25 @@ async def rag_query(request: QueryRequest):
     """RAG query endpoint with LLM synthesis"""
     global request_counter
     request_counter += 1
-    
+
     try:
         # Use synthesis instead of raw search
-        result = search_with_synthesis(
-            query=request.q,
-            top_k=8,
-            scope=request.scope
-        )
-        
+        result = search_with_synthesis(query=request.q, top_k=8, scope=request.scope)
+
         return {
-            "answer": result['answer'],
-            "citations": result['citations'],
-            "synthesized": result.get('synthesized', False),
-            "num_sources": len(result['citations'])
+            "answer": result["answer"],
+            "citations": result["citations"],
+            "synthesized": result.get("synthesized", False),
+            "num_sources": len(result["citations"]),
         }
-        
+
     except Exception as e:
         logger.error(f"Query failed: {e}")
         return {
             "answer": "Sorry, I encountered an error processing your query.",
             "citations": [],
             "synthesized": False,
-            "error": str(e)
+            "error": str(e),
         }
 
 
@@ -451,30 +469,23 @@ async def rag_query_categorized(request: QueryRequest):
     RAG query with results grouped by class and date
     """
     from rag.search import search_with_categories
-    
+
     try:
-        result = search_with_categories(
-            query=request.q,
-            top_k=8,
-            scope=request.scope
-        )
-        
+        result = search_with_categories(query=request.q, top_k=8, scope=request.scope)
+
         # Also synthesize answer
         from rag.search import search_with_synthesis
-        synthesis = search_with_synthesis(
-            query=request.q,
-            top_k=8,
-            scope=request.scope
-        )
-        
+
+        synthesis = search_with_synthesis(query=request.q, top_k=8, scope=request.scope)
+
         return {
-            "answer": synthesis['answer'],
-            "results": result['results'],
-            "by_class": result['by_class'],
-            "by_date": result['by_date'],
-            "total": result['total']
+            "answer": synthesis["answer"],
+            "results": result["results"],
+            "by_class": result["by_class"],
+            "by_date": result["by_date"],
+            "total": result["total"],
         }
-        
+
     except Exception as e:
         logger.error(f"Categorized query failed: {e}")
         raise HTTPException(500, str(e))

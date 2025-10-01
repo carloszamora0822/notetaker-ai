@@ -80,7 +80,9 @@ def synthesize_answer(query: str, chunks: List[Dict], max_tokens: int = 500) -> 
 
     # Build context from chunks
     context = "\n\n".join(
-        [f"[{chunk['citation']}]: {chunk['chunk']}" for chunk in chunks[:5]]  # Use top 5 chunks
+        [
+            f"[{chunk['citation']}]: {chunk['chunk']}" for chunk in chunks[:5]
+        ]  # Use top 5 chunks
     )
 
     # Create prompt
@@ -111,7 +113,7 @@ Format Example:
 • Key point with **important term**
 • Another detail
 
-## 💡 Main Topic 2  
+## 💡 Main Topic 2
 • More information
 
 Answer:"""
@@ -134,9 +136,8 @@ Answer:"""
     except Exception as e:
         logger.error(f"LLM synthesis failed: {e}")
         # Fallback to simple concatenation
-        return (
-            f"Found {len(chunks)} relevant notes:\n\n"
-            + "\n\n".join([f"• {c['chunk'][:200]}..." for c in chunks[:3]])
+        return f"Found {len(chunks)} relevant notes:\n\n" + "\n\n".join(
+            [f"• {c['chunk'][:200]}..." for c in chunks[:3]]
         )
 
 
@@ -203,12 +204,12 @@ Provide formatted, actionable notes:"""
             model=model,
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
+                {"role": "user", "content": user_prompt},
             ],
             options={
                 "temperature": 0.4,  # Slightly higher for creative insights
-                "top_p": 0.9
-            }
+                "top_p": 0.9,
+            },
         )
 
         formatted = response["message"]["content"].strip()
@@ -244,7 +245,9 @@ Provide formatted, actionable notes:"""
         if "not found" in str(e).lower():
             error_msg = f"Model '{model}' not found. Install with: ollama pull {model}"
         elif "connection" in str(e).lower():
-            error_msg = "Cannot connect to Ollama. Is it running? Start with: ollama serve"
+            error_msg = (
+                "Cannot connect to Ollama. Is it running? Start with: ollama serve"
+            )
 
         return {
             "formatted_text": text,

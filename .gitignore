@@ -90,3 +90,12 @@ dmypy.json
 # But keep important docs
 !README.md
 !requirements.txt
+
+# Large model files (download separately)
+rag/models/**/*.safetensors
+rag/models/**/*.bin
+rag/models/**/pytorch_model.bin
+
+# Generated PDFs and LaTeX temp files
+latex/templates/*.pdf
+latex/output/*.pdf
