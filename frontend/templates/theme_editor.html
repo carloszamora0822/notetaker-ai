@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="/static/css/theme-editor.css">
+
+<div class="theme-editor-container">
+  <h1>🎨 Class Theme Editor</h1>
+  <p class="subtitle">Customize colors for your class PDFs</p>
+  
+  <div class="theme-list" id="themeList">
+    <!-- Loaded dynamically -->
+  </div>
+  
+  <button onclick="addNewClass()" class="btn-add">+ Add New Class</button>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Edit Theme: <span id="editClassName"></span></h2>
+      <button onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="color-picker-section">
+        <label>Choose Color:</label>
+        <div class="color-swatches" id="colorSwatches">
+          <!-- Loaded dynamically -->
+        </div>
+      </div>
+      
+      <div class="preview-section">
+        <h3>Preview</h3>
+        <div class="pdf-preview" id="pdfPreview">
+          <div class="preview-header" id="previewHeader">
+            <span id="previewClassName">Class Name</span>
+          </div>
+          <div class="preview-content">
+            Sample content goes here...
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="saveTheme()" class="btn-save">💾 Save</button>
+      <button onclick="closeModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/theme-editor.js"></script>
+{% endblock %}
