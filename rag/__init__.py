@@ -9,6 +9,7 @@ from rag.search import (
     search_with_categories,
     search_with_synthesis,
 )
+from rag.title_generator import extract_date_from_content, generate_title
 
 __all__ = [
     "search",
@@ -18,4 +19,6 @@ __all__ = [
     "search_with_synthesis",
     "search_with_categories",
     "summarize_for_pdf",
+    "generate_title",
+    "extract_date_from_content",
 ]

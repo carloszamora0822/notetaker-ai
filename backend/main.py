@@ -63,6 +63,37 @@ if static_dir.exists():
 request_counter = 0
 
 
+# Helper functions for AI-generated filenames
+def sanitize_filename(title: str) -> str:
+    """Sanitize AI-generated title for safe filename (spaces allowed)"""
+    # Remove invalid filename characters but keep spaces
+    invalid_chars = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
+    sanitized = title
+    for char in invalid_chars:
+        sanitized = sanitized.replace(char, "")
+    # Trim and limit length
+    sanitized = sanitized.strip()[:100]
+    return sanitized if sanitized else "Untitled"
+
+
+def get_unique_filename(inbox_path: Path, base_name: str) -> str:
+    """Get unique filename by adding (2), (3), etc. if file exists"""
+    filename = f"{base_name}.txt"
+    file_path = inbox_path / filename
+
+    if not file_path.exists():
+        return filename
+
+    # File exists, find unique counter
+    counter = 2
+    while True:
+        filename = f"{base_name} ({counter}).txt"
+        file_path = inbox_path / filename
+        if not file_path.exists():
+            return filename
+        counter += 1
+
+
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     """Serve the main page"""
@@ -167,19 +198,52 @@ async def reset_theme(class_code: str):
 
 @app.get("/api/classes")
 async def list_classes():
-    """Get all registered classes with metadata"""
+    """Get all registered classes with metadata (with accurate file counts)"""
     themes = load_themes()
-    classes = []
 
+    # Get actual file counts from filesystem
+    inbox_path = BASE_DIR / CFG["paths"]["inbox_global"]
+    actual_counts = {}
+
+    if inbox_path.exists():
+        import json
+
+        for f in inbox_path.glob("*.txt"):
+            # Try to get class from metadata file
+            meta_path = inbox_path / f"{f.stem}.meta.json"
+            if meta_path.exists():
+                try:
+                    metadata = json.loads(meta_path.read_text())
+                    class_code = metadata.get("class_code", "GENERAL")
+                except:
+                    # Fallback: parse old filename format
+                    parts = f.stem.split("_", 1)
+                    if len(parts) > 1 and parts[0].count("-") == 2:
+                        class_code = parts[1]
+                    else:
+                        class_code = "GENERAL"
+            else:
+                # Fallback: parse old filename format
+                parts = f.stem.split("_", 1)
+                if len(parts) > 1 and parts[0].count("-") == 2:
+                    class_code = parts[1]
+                else:
+                    class_code = "GENERAL"
+
+            actual_counts[class_code] = actual_counts.get(class_code, 0) + 1
+
+    classes = []
     for code, theme in themes.items():
         if code in ["default", "color_palette"]:
             continue
+
+        file_count = actual_counts.get(code, 0)
 
         classes.append(
             {
                 "code": code,
                 "color": theme.get("primary_color", "#0B72B9"),
-                "file_count": theme.get("file_count", 0),
+                "file_count": file_count,
                 "created_at": theme.get("created_at", None),
             }
         )
@@ -192,11 +256,33 @@ async def list_classes():
 @app.delete("/api/classes/{class_code}")
 async def delete_class_endpoint(class_code: str):
     """Delete class (must have 0 files)"""
-    theme = get_theme(class_code)
+    import json
 
-    if theme.get("file_count", 0) > 0:
+    # Count actual files for this class
+    inbox_path = BASE_DIR / CFG["paths"]["inbox_global"]
+    actual_count = 0
+
+    if inbox_path.exists():
+        for f in inbox_path.glob("*.txt"):
+            # Check metadata file
+            meta_path = inbox_path / f"{f.stem}.meta.json"
+            if meta_path.exists():
+                try:
+                    metadata = json.loads(meta_path.read_text())
+                    if metadata.get("class_code") == class_code:
+                        actual_count += 1
+                except:
+                    pass
+            else:
+                # Check old filename format
+                parts = f.stem.split("_", 1)
+                if len(parts) > 1 and parts[0].count("-") == 2:
+                    if parts[1] == class_code:
+                        actual_count += 1
+
+    if actual_count > 0:
         raise HTTPException(
-            400, f"Cannot delete {class_code}: has {theme['file_count']} files"
+            400, f"Cannot delete {class_code}: has {actual_count} files"
         )
 
     delete_class(class_code)
@@ -215,33 +301,82 @@ async def info():
 
 @app.get("/api/files")
 async def list_files(class_code: str = None):
-    """List all uploaded files with metadata"""
+    """List all uploaded files with enhanced metadata"""
     inbox_path = BASE_DIR / CFG["paths"]["inbox_global"]
     if not inbox_path.exists():
         return {"files": []}
 
+    import json
+
     files = []
     for f in inbox_path.glob("*.txt"):
-        parts = f.stem.split("_", 1)
-        fc = parts[1] if len(parts) > 1 else "GENERAL"
-        if class_code and fc != class_code:
+        # Try to load metadata from sidecar JSON file
+        meta_path = inbox_path / f"{f.stem}.meta.json"
+        metadata = {}
+
+        if meta_path.exists():
+            try:
+                metadata = json.loads(meta_path.read_text())
+            except Exception as e:
+                logger.warning(f"Failed to read metadata for {f.name}: {e}")
+
+        # Get values from metadata or fallback to parsing filename
+        if metadata:
+            file_class_code = metadata.get("class_code", "GENERAL")
+            title = metadata.get("title", f.stem)
+            upload_timestamp = metadata.get("upload_timestamp")
+            content_date = metadata.get("content_date")
+            original_filename = metadata.get("original_filename")
+        else:
+            # Backward compatibility: Parse old format "2025-10-01_CLASSNAME.txt"
+            parts = f.stem.split("_", 1)
+            if len(parts) > 1 and parts[0].count("-") == 2:
+                file_class_code = parts[1]
+                title = f.stem
+            else:
+                file_class_code = "GENERAL"
+                title = f.stem
+            upload_timestamp = None
+            content_date = None
+            original_filename = None
+
+        # Filter by class if requested
+        if class_code and file_class_code != class_code:
             continue
 
+        # Get PDF status
         pdf = BASE_DIR / "latex/output" / f"{f.stem}.pdf"
-        files.append(
-            {
-                "filename": f.name,
-                "date": parts[0],
-                "class_code": fc,
-                "size": f.stat().st_size,
-                "modified": f.stat().st_mtime,
-                "has_pdf": pdf.exists(),
-                "pdf_url": f"/pdf/{f.stem}.pdf" if pdf.exists() else None,
-            }
-        )
 
-    files.sort(key=lambda x: x["modified"], reverse=True)
-    return {"files": files}
+        # Build file info with rich metadata
+        file_info = {
+            "filename": f.name,
+            "title": title,
+            "class_code": file_class_code,
+            "size": f.stat().st_size,
+            "modified": f.stat().st_mtime,
+            "upload_timestamp": upload_timestamp,
+            "content_date": content_date,
+            "original_filename": original_filename,
+            "has_pdf": pdf.exists(),
+            "pdf_url": f"/pdf/{f.stem}.pdf" if pdf.exists() else None,
+        }
+        files.append(file_info)
+
+    # Sort by content_date if available, else upload_timestamp, else modified time
+    def sort_key(x):
+        # Prefer content_date (when extracted from notes)
+        if x.get("content_date"):
+            return x["content_date"]
+        # Then upload_timestamp
+        if x.get("upload_timestamp"):
+            return x["upload_timestamp"]
+        # Finally fall back to file modified time
+        from datetime import datetime
+
+        return datetime.fromtimestamp(x["modified"]).isoformat()
+
+    files.sort(key=sort_key, reverse=True)
+    return {"files": files, "total": len(files)}
 
 
 @app.get("/api/file/{filename}")
@@ -258,6 +393,30 @@ async def get_file(filename: str):
         "date": parts[0],
         "class_code": parts[1] if len(parts) > 1 else "GENERAL",
     }
+
+
+@app.post("/api/sync")
+async def sync_database():
+    """Sync vector DB with filesystem - remove orphaned vectors"""
+    import subprocess
+
+    logger.info("🔄 Starting database sync...")
+    try:
+        result = subprocess.run(
+            [".venv/bin/python3", "ops/scripts/cleanup_orphans.py"],
+            capture_output=True,
+            text=True,
+            cwd=BASE_DIR,
+        )
+        if result.returncode == 0:
+            return {
+                "success": True,
+                "message": "Database synced",
+                "output": result.stdout,
+            }
+        return {"success": False, "error": result.stderr}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
 
 
 @app.delete("/api/file/{filename}")
@@ -309,13 +468,14 @@ async def serve_pdf(filename: str):
 
 @app.post("/ingest")
 async def ingest(file: UploadFile, class_code: str = Form("")):
-    """Ingest endpoint - auto-registers classes and generates PDFs"""
+    """Ingest endpoint - AI-generated filenames with smart metadata"""
     global request_counter
     request_counter += 1
 
-    # Read file content
+    # STEP 1: Read file content
     content = await file.read()
     text = content.decode("utf-8")
+    original_filename = file.filename or "upload.txt"
 
     # Normalize class code to UPPERCASE
     class_code = class_code.strip().upper() or "GENERAL"
@@ -325,29 +485,55 @@ async def ingest(file: UploadFile, class_code: str = Form("")):
         register_class(class_code)
         logger.info(f"Auto-registered new class: {class_code}")
 
-    # Increment file count
     increment_file_count(class_code)
 
-    # Build filename
-    today = date.today().isoformat()
-    filename = f"{today}_{class_code}.txt"
+    # STEP 2: Generate AI title from content
+    logger.info(f"🤖 Generating AI title for uploaded content...")
+    from rag.title_generator import generate_title
 
-    # Save to inbox (using config)
+    ai_title = generate_title(text)
+    logger.info(f"📝 Generated title: {ai_title}")
+
+    # STEP 3: Extract date from content (optional)
+    from rag.title_generator import extract_date_from_content
+
+    content_date = extract_date_from_content(text)
+    logger.info(f"📅 Extracted date: {content_date or 'None'}")
+
+    # STEP 4: Sanitize title for filename
+    safe_title = sanitize_filename(ai_title)
+
+    # STEP 5: Get unique filename (handles duplicates)
     inbox_path = BASE_DIR / CFG["paths"]["inbox_global"]
     inbox_path.mkdir(exist_ok=True)
+    filename = get_unique_filename(inbox_path, safe_title)
+    logger.info(f"💾 Final filename: {filename}")
 
+    # STEP 6: Save file
     file_path = inbox_path / filename
     file_path.write_text(text)
 
-    receipt_id = f"{today}_{class_code}" if class_code else today
-
-    # Index RAW text in RAG (for search)
+    # STEP 7: Create enhanced metadata
+    upload_timestamp = datetime.now().isoformat()
     metadata = {
-        "class_code": class_code,
-        "date": today,
+        "title": ai_title,
         "filename": filename,
+        "class_code": class_code,
+        "upload_timestamp": upload_timestamp,
+        "content_date": content_date,
+        "original_filename": original_filename,
+        "date": content_date
+        or upload_timestamp.split("T")[0],  # Required by index_document
     }
 
+    # Save metadata as sidecar JSON file
+    import json
+
+    meta_path = inbox_path / f"{file_path.stem}.meta.json"
+    meta_path.write_text(json.dumps(metadata, indent=2))
+    logger.info(f"💾 Saved metadata: {meta_path.name}")
+
+    # Index with new metadata
     indexed = index_document(text, metadata)
 
     # ✨ STEP 1: Format text with LLM before PDF generation
@@ -372,16 +558,24 @@ async def ingest(file: UploadFile, class_code: str = Form("")):
         # Get theme for this class
         theme = get_theme(class_code)
 
-        # Generate themed LaTeX with formatted content
+        # Generate themed LaTeX with formatted content and AI title
         # is_formatted=True means content has markdown-style formatting from LLM
         logger.info(f"📄 Generating LaTeX (formatted={llm_success})...")
-        tex_content = generate_themed_latex(
+
+        # Use content_date if available, else upload date
+        display_date = content_date or upload_timestamp.split("T")[0]
+
+        # Generate LaTeX with AI title
+        tex_content, pdf_filename = generate_themed_latex(
             content=formatted_text,
-            class_code=class_code,
-            date=today,
+            class_code=class_code,  # Keep actual class code
+            date=display_date,
+            title=ai_title,  # Pass AI title as title parameter
             theme=theme,
-            is_formatted=llm_success,  # Only use markdown conversion if LLM succeeded
+            is_formatted=llm_success,
         )
+
+        logger.info(f"📄 Generated LaTeX with filename: {pdf_filename}")
 
         # Save .tex file
         tex_path = BASE_DIR / "latex/templates" / f"{file_path.stem}.tex"
@@ -404,23 +598,33 @@ async def ingest(file: UploadFile, class_code: str = Form("")):
             timeout=15,
         )
 
-        if result.returncode == 0:
+        # Check if PDF was actually created (pdflatex might return non-zero on warnings)
+        pdf_path = output_dir / f"{file_path.stem}.pdf"
+        if pdf_path.exists():
             pdf_url = f"/pdf/{file_path.stem}.pdf"
             logger.info(f"✅ PDF generated: {pdf_url}")
         else:
-            logger.error(f"LaTeX compilation failed: {result.stderr.decode()}")
+            logger.error(f"LaTeX compilation failed (return code: {result.returncode})")
+            logger.error(f"stderr: {result.stderr.decode()[:500]}")
+            logger.error(f"stdout: {result.stdout.decode()[:500]}")
 
     except Exception as e:
         logger.warning(f"PDF generation failed: {e}")
 
     return {
+        "success": True,
+        "title": ai_title,
+        "filename": filename,
         "stored": str(file_path),
-        "receipt_id": f"{today}_{class_code}",
+        "class_code": class_code,
+        "upload_timestamp": upload_timestamp,
+        "content_date": content_date,
+        "original_filename": original_filename,
         "indexed": indexed,
         "pdf_url": pdf_url,
         "llm_formatted": llm_success,
         "format_error": format_result.get("error"),
-        "model_used": format_result.get("model_used"),  # Show which model was used
+        "model_used": format_result.get("model_used"),
         "help": {
             "message": "LLM formatting failed. PDF uses basic formatting.",
             "action": "Check /api/health/ollama for Ollama status",

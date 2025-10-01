@@ -7,44 +7,127 @@ logger = logging.getLogger(__name__)
 
 BASE_TEMPLATE_PATH = Path(__file__).parent / "base_template.tex"
 
-# Default themes for different classes
+# Default themes for different classes - Modern color palettes
 DEFAULT_THEMES = {
     "AI": {
         "primary_color": "#0B72B9",
         "secondary_color": "#64B5F6",
-        "description": "Blue theme for AI courses",
+        "accent_color": "#1E88E5",
+        "description": "Modern blue theme for AI courses",
     },
     "CS": {
-        "primary_color": "#1976D2",
+        "primary_color": "#1565C0",
         "secondary_color": "#42A5F5",
+        "accent_color": "#1976D2",
         "description": "Deep blue for Computer Science",
     },
     "MATH": {
-        "primary_color": "#7B1FA2",
+        "primary_color": "#6A1B9A",
         "secondary_color": "#BA68C8",
+        "accent_color": "#8E24AA",
         "description": "Purple for Mathematics",
     },
     "PHYS": {
         "primary_color": "#C62828",
         "secondary_color": "#EF5350",
+        "accent_color": "#E53935",
         "description": "Red for Physics",
     },
     "BIO": {
         "primary_color": "#2E7D32",
         "secondary_color": "#66BB6A",
+        "accent_color": "#43A047",
         "description": "Green for Biology",
     },
     "CHEM": {
-        "primary_color": "#F57C00",
+        "primary_color": "#EF6C00",
         "secondary_color": "#FFB74D",
+        "accent_color": "#F57C00",
         "description": "Orange for Chemistry",
+    },
+    "MUSIC": {
+        "primary_color": "#8E24AA",
+        "secondary_color": "#CE93D8",
+        "accent_color": "#AB47BC",
+        "description": "Purple for Music",
+    },
+    "SHPE": {
+        "primary_color": "#D84315",
+        "secondary_color": "#FF8A65",
+        "accent_color": "#F4511E",
+        "description": "Orange/Red for SHPE",
+    },
+    "TEST": {
+        "primary_color": "#00897B",
+        "secondary_color": "#4DB6AC",
+        "accent_color": "#26A69A",
+        "description": "Teal for testing",
     },
     "DEFAULT": {
         "primary_color": "#0B72B9",
         "secondary_color": "#64B5F6",
+        "accent_color": "#1E88E5",
         "description": "Default blue theme",
     },
 }
+
+
+def title_to_pdf_name(title: str, max_length: int = 50) -> str:
+    """
+    Convert title to kebab-case filename.
+
+    Converts: "SHPE VP Meeting 4" -> "shpe-vp-meeting-4"
+
+    Rules:
+    - Convert to lowercase
+    - Replace spaces with hyphens
+    - Remove special characters except hyphens
+    - Limit to max_length characters
+    - Remove leading/trailing hyphens
+
+    Args:
+        title: Original title string
+        max_length: Maximum length of output (default: 50)
+
+    Returns:
+        Kebab-case filename (without extension)
+    """
+    import re
+
+    if not title:
+        return "untitled"
+
+    # Convert to lowercase
+    name = title.lower()
+
+    # Replace spaces and underscores with hyphens
+    name = re.sub(r"[\s_]+", "-", name)
+
+    # Remove all special characters except hyphens and alphanumeric
+    name = re.sub(r"[^a-z0-9-]+", "", name)
+
+    # Replace multiple consecutive hyphens with single hyphen
+    name = re.sub(r"-+", "-", name)
+
+    # Remove leading and trailing hyphens
+    name = name.strip("-")
+
+    # Limit length
+    if len(name) > max_length:
+        # Try to cut at a hyphen if possible
+        truncated = name[:max_length]
+        last_hyphen = truncated.rfind("-")
+        if last_hyphen > max_length * 0.7:  # At least 70% of max length
+            name = truncated[:last_hyphen]
+        else:
+            name = truncated
+        name = name.rstrip("-")
+
+    # Fallback if empty
+    if not name:
+        return "untitled"
+
+    return name
 
 
 def get_theme_for_class(class_code: str) -> Dict:
@@ -253,9 +336,10 @@ def generate_themed_latex(
     content: str,
     class_code: str,
     date: str,
+    title: Optional[str] = None,
     theme: Optional[Dict] = None,
     is_formatted: bool = False,
-) -> str:
+) -> tuple[str, str]:
     """
     Generate LaTeX content with class-specific theme.
 
@@ -263,13 +347,15 @@ def generate_themed_latex(
         content: The note text content (raw or pre-formatted)
         class_code: Class identifier (e.g., "AI101", "CS229")
         date: Date string (e.g., "2025-10-01")
+        title: Optional title for the document (generates kebab-case filename)
+               If None, uses date_classCode format
         theme: Optional custom theme dict with colors and styling
                If None, will auto-detect based on class_code
         is_formatted: If True, content is pre-formatted markdown from LLM
                      If False, content is raw text that needs escaping
 
     Returns:
-        Complete LaTeX source code
+        Tuple of (LaTeX source code, kebab-case filename without extension)
     """
     # Auto-detect theme if not provided
     if theme is None:
@@ -288,6 +374,7 @@ def generate_themed_latex(
     # Extract colors (remove # for LaTeX)
     primary = theme.get("primary_color", "#0B72B9").lstrip("#")
     secondary = theme.get("secondary_color", "#64B5F6").lstrip("#")
+    accent = theme.get("accent_color", "#1E88E5").lstrip("#")
 
     # Process content based on format
     if is_formatted:
@@ -302,11 +389,22 @@ def generate_themed_latex(
     # Replace placeholders
     latex = template.replace("PRIMARY_COLOR", primary)
     latex = latex.replace("SECONDARY_COLOR", secondary)
+    latex = latex.replace("ACCENT_COLOR", accent)
     latex = latex.replace("CLASS_NAME", class_code)
     latex = latex.replace("DATE", date)
     latex = latex.replace("CONTENT", content_processed)
 
-    return latex
+    # Generate filename
+    if title:
+        # Use title for kebab-case filename
+        filename = title_to_pdf_name(title)
+        logger.info(f"Generated filename from title: {filename}")
+    else:
+        # Fallback to date_classCode format
+        filename = f"{date}_{class_code}"
+        logger.info(f"Generated filename from date+class: {filename}")
+
+    return latex, filename
 
 
 def escape_latex(text: str) -> str:
@@ -389,6 +487,10 @@ if __name__ == "__main__":
     test_content = "This is a test lecture about algorithms and data structures."
     test_class = "CS101"
     test_date = "2025-10-01"
+    test_title = "SHPE VP Meeting 4"
 
-    latex = generate_themed_latex(test_content, test_class, test_date)
+    latex, filename = generate_themed_latex(
+        test_content, test_class, test_date, title=test_title
+    )
+    print(f"Generated filename: {filename}")
     print(latex)

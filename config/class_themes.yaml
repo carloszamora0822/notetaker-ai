@@ -22,11 +22,14 @@ default:
   font_family: modern
   primary_color: '#0B72B9'
   secondary_color: '#64B5F6'
-TODO:
+EXPERIENCING MUSIC:
   color_name: red
   primary_color: '#dc3545'
   secondary_color: '#ff6b6b'
-LATIN HERITAGE MONTH COMMITTEE:
-  color_name: red
-  primary_color: '#dc3545'
-  secondary_color: '#ff6b6b'
+  file_count: 1
+DATABASE MANAGEMENT SYSTEMS:
+  color_name: green
+  primary_color: '#28a745'
+  secondary_color: '#66bb6a'
+  file_count: 1
+  created_at: '2025-10-01T11:28:34.616648'

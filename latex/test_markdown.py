@@ -83,7 +83,7 @@ Neural networks consist of:
 **Important**: Use *early stopping* to prevent overfitting.
 """
 
-latex_formatted = generate_themed_latex(
+latex_formatted, filename = generate_themed_latex(
     content=formatted_content, class_code="AI101", date="2025-10-01", is_formatted=True
 )
 
@@ -91,6 +91,7 @@ latex_formatted = generate_themed_latex(
 output_path = Path("templates/test_formatted_AI101.tex")
 output_path.write_text(latex_formatted)
 print(f"Generated: {output_path}")
+print(f"Filename: {filename}")
 
 # Test 3: Raw text (existing behavior)
 print()
@@ -100,7 +101,7 @@ print("=" * 60)
 
 raw_content = "This is raw text with special characters: $ & % # _ { }"
 
-latex_raw = generate_themed_latex(
+latex_raw, filename_raw = generate_themed_latex(
     content=raw_content,
     class_code="CS101",
     date="2025-10-01",
@@ -110,6 +111,7 @@ latex_raw = generate_themed_latex(
 output_path_raw = Path("templates/test_raw_CS101.tex")
 output_path_raw.write_text(latex_raw)
 print(f"Generated: {output_path_raw}")
+print(f"Filename: {filename_raw}")
 
 print()
 print("=" * 60)

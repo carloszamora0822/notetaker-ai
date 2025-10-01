@@ -23,16 +23,16 @@ async function loadThemes() {
 async function loadFiles() {
   const fileList = document.getElementById('fileList');
   fileList.innerHTML = '<div class="loading">Loading files...</div>';
-  
+
   try {
     const res = await fetch('/api/files');
     const data = await res.json();
-    
+
     if (data.files.length === 0) {
       fileList.innerHTML = '<p class="empty">No files yet</p>';
       return;
     }
-    
+
     // Group files by class
     const filesByClass = {};
     data.files.forEach(f => {
@@ -41,12 +41,12 @@ async function loadFiles() {
       }
       filesByClass[f.class_code].push(f);
     });
-    
+
     // Render class sections
     fileList.innerHTML = Object.entries(filesByClass).map(([className, files]) => {
       const theme = themes[className] || themes.default || {};
       const color = theme.primary_color || '#0B72B9';
-      
+
       return `
         <div class="class-section">
           <div class="class-header" style="border-left: 4px solid ${color}">
@@ -61,16 +61,32 @@ async function loadFiles() {
           </div>
           <div class="class-files">
             ${files.map(f => {
-              // Format date - use content_date if available, else upload_timestamp
-              const displayDate = f.content_date || new Date(f.upload_timestamp).toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
-              });
-              
+              // Format date - use content_date if available, else upload_timestamp, else modified time
+              let displayDate;
+              if (f.content_date) {
+                displayDate = new Date(f.content_date).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                });
+              } else if (f.upload_timestamp) {
+                displayDate = new Date(f.upload_timestamp).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                });
+              } else {
+                // Fallback to file modified time
+                displayDate = new Date(f.modified * 1000).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                });
+              }
+
               // Build tooltip with metadata
               const tooltip = `Original file: ${f.original_filename || f.filename}\nUploaded: ${new Date(f.upload_timestamp).toLocaleString()}`;
-              
+
               return `
               <div class="file-card" onclick="openViewer('${f.filename}')" title="${tooltip}">
                 <div class="file-icon">📄</div>
@@ -102,15 +118,15 @@ async function loadFiles() {
 
 async function openViewer(filename) {
   currentFile = filename;
-  
+
   try {
     const res = await fetch(`/api/file/${filename}`);
     const data = await res.json();
-    
+
     // Show AI-generated title or fallback to filename
     document.getElementById('viewerTitle').textContent = data.title || filename;
     document.getElementById('fileContent').value = data.content;
-    
+
     document.getElementById('viewerModal').classList.remove('hidden');
   } catch (error) {
     alert('Failed to load file');
@@ -120,41 +136,41 @@ async function openViewer(filename) {
 function editTheme(className) {
   currentEditClass = className;
   const theme = themes[className] || themes.default || {};
-  
+
   // Close class manager modal if it's open to prevent stacking
   const classManagerModal = document.getElementById('classManagerModal');
   if (classManagerModal && !classManagerModal.classList.contains('hidden')) {
     classManagerModal.classList.add('hidden');
   }
-  
+
   document.getElementById('themeClassName').textContent = className;
   document.getElementById('previewClassName').textContent = className;
-  
+
   // Render color swatches
   const swatches = document.getElementById('colorSwatches');
   swatches.innerHTML = Object.entries(colorPalette).map(([name, colors]) => `
-    <div class="color-swatch ${theme.color_name === name ? 'active' : ''}" 
+    <div class="color-swatch ${theme.color_name === name ? 'active' : ''}"
          onclick="selectColor('${name}', '${colors.primary}', '${colors.secondary}')">
       <div class="swatch-color" style="background: ${colors.primary}"></div>
       <span>${name}</span>
     </div>
   `).join('');
-  
+
   // Update preview
   updateThemePreview(theme.primary_color || '#0B72B9');
-  
+
   document.getElementById('themeModal').classList.remove('hidden');
 }
 
 function selectColor(name, primary, secondary) {
   selectedColor = { name, primary, secondary };
-  
+
   // Update active state
   document.querySelectorAll('.color-swatch').forEach(el => {
     el.classList.remove('active');
   });
   event.currentTarget.classList.add('active');
-  
+
   // Update preview
   updateThemePreview(primary);
 }
@@ -168,20 +184,20 @@ async function saveTheme() {
     alert('Please select a color');
     return;
   }
-  
+
   const theme = {
     color_name: selectedColor.name,
     primary_color: selectedColor.primary,
     secondary_color: selectedColor.secondary
   };
-  
+
   try {
     const res = await fetch(`/api/themes/${currentEditClass}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(theme)
     });
-    
+
     if (res.ok) {
       alert('✅ Theme saved!');
       closeThemeEditor();
@@ -203,11 +219,11 @@ function closeThemeEditor() {
 async function deleteFile(filename = null) {
   const file = filename || currentFile;
   if (!file || !confirm(`Delete ${file}?`)) return;
-  
+
   try {
     const res = await fetch(`/api/file/${file}`, {method: 'DELETE'});
     const data = await res.json();
-    
+
     if (data.success) {
       alert(`✅ Deleted ${data.deleted_count} items`);
       if (!filename) closeViewer();
@@ -228,7 +244,7 @@ async function openClassManager() {
   try {
     const res = await fetch('/api/classes');
     const data = await res.json();
-    
+
     const list = document.getElementById('classList');
     list.innerHTML = data.classes.map(cls => `
       <div class="class-manage-card">
@@ -239,13 +255,13 @@ async function openClassManager() {
         </div>
         <div class="class-actions">
           <button onclick="editTheme('${cls.code}')" class="btn-edit">🎨 Theme</button>
-          ${cls.file_count === 0 ? 
-            `<button onclick="deleteClass('${cls.code}')" class="btn-danger">🗑️ Delete</button>`  
+          ${cls.file_count === 0 ?
+            `<button onclick="deleteClass('${cls.code}')" class="btn-danger">🗑️ Delete</button>`
             : ''}
         </div>
       </div>
     `).join('');
-    
+
     document.getElementById('classManagerModal').classList.remove('hidden');
   } catch (error) {
     alert('Failed to load classes');
@@ -254,7 +270,7 @@ async function openClassManager() {
 
 async function deleteClass(className) {
   if (!confirm(`Delete class "${className}"? This cannot be undone.`)) return;
-  
+
   try {
     const res = await fetch(`/api/classes/${className}`, { method: 'DELETE' });
     if (res.ok) {

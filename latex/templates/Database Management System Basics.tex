@@ -1,0 +1,277 @@
+\documentclass[11pt,letterpaper]{article}
+
+% Modern packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}  % Better font
+\usepackage{microtype}  % Better typography
+\usepackage{xcolor}
+\usepackage{geometry}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{enumitem}  % Better lists
+\usepackage{tcolorbox}  % Colorful boxes
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}  % Math support
+
+% Page geometry with better margins
+\geometry{
+    margin=0.9in,
+    top=1.1in,
+    headheight=14pt
+}
+
+% Theme colors (will be replaced by generator)
+\definecolor{primarycolor}{HTML}{28a745}
+\definecolor{secondarycolor}{HTML}{66bb6a}
+\definecolor{accentcolor}{HTML}{1E88E5}
+\definecolor{backgroundcolor}{HTML}{F8F9FA}
+
+% Modern header styling with gradient effect
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\textcolor{primarycolor}{\small\textbf{DATABASE MANAGEMENT SYSTEMS}}}
+\fancyhead[R]{\textcolor{secondarycolor!80}{\small 2025-09-04}}
+\fancyfoot[C]{\textcolor{primarycolor!60}{\small\thepage}}
+\renewcommand{\headrulewidth}{0.5pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{primarycolor!30}\leaders\hrule height \headrulewidth\hfill}}
+
+% Hyperref setup
+\hypersetup{
+    colorlinks=true,
+    linkcolor=primarycolor,
+    urlcolor=secondarycolor,
+    citecolor=primarycolor,
+    pdfborder={0 0 0}
+}
+
+% Modern section formatting with boxes
+\usepackage{titlesec}
+\titleformat{\section}
+  {\Large\bfseries\color{primarycolor}}
+  {}{0pt}{}
+  [\vspace{-8pt}{\color{primarycolor}\titlerule[1.5pt]}]
+
+\titleformat{\subsection}
+  {\large\bfseries\color{secondarycolor}}
+  {\textcolor{secondarycolor}{\textbullet}\hspace{0.3em}}{0pt}{}
+
+\titleformat{\subsubsection}
+  {\normalsize\bfseries\color{accentcolor}}
+  {\textcolor{accentcolor}{\tiny\blacksquare}\hspace{0.3em}}{0pt}{}
+
+% Title styling
+\title{\textcolor{primarycolor}{\Huge\textbf{DATABASE MANAGEMENT SYSTEMS Notes}}}
+\author{}
+\date{\textcolor{secondarycolor}{2025-09-04}}
+
+% Customize list styling
+\setlist[itemize]{leftmargin=*, itemsep=3pt, topsep=6pt}
+\setlist[enumerate]{leftmargin=*, itemsep=3pt, topsep=6pt}
+
+% Custom box for highlights
+\newtcolorbox{highlightbox}{%
+    colback=secondarycolor!5,
+    colframe=primarycolor,
+    boxrule=0.5pt,
+    arc=3pt,
+    left=8pt,
+    right=8pt,
+    top=6pt,
+    bottom=6pt
+}
+
+\begin{document}
+
+% Modern title page with gradient background effect
+\begin{tcolorbox}[
+    enhanced,
+    colback=backgroundcolor,
+    colframe=primarycolor,
+    boxrule=2pt,
+    arc=8pt,
+    width=\textwidth,
+    left=0pt,
+    right=0pt,
+    top=0pt,
+    bottom=0pt
+]
+    \begin{center}
+        \vspace{1.2cm}
+        % Main title with modern styling
+        {\fontsize{32}{38}\selectfont\textcolor{primarycolor}{\textbf{DATABASE MANAGEMENT SYSTEMS}}} \\[0.8cm]
+
+        % Decorative line
+        {\color{secondarycolor}\rule{0.6\textwidth}{1.5pt}} \\[0.5cm]
+
+        % Subtitle
+        {\Large\textcolor{secondarycolor!80}{\textit{Lecture Notes}}} \\[0.4cm]
+
+        % Date with icon-style bullet
+        {\large\textcolor{accentcolor}{\textbullet\hspace{0.3em}2025-09-04\hspace{0.3em}\textbullet}} \\[0.3cm]
+
+        \vspace{1cm}
+    \end{center}
+\end{tcolorbox}
+
+\vspace{1.5cm}
+
+% Content section with better spacing
+\textbf{Database Management Systems (DBMS)}
+
+\subsubsection*{Overview}
+DBMS is a system that manages data by providing an interface between users and databases.
+
+#### Why DBMS?
+DBMS helps avoid:
+\begin{itemize}
+  \item Redundancy
+  \item Inconsistency
+  \item Security breaches
+  \item Concurrency issues
+  \item Data loss due to recovery
+\end{itemize}
+
+\subsubsection*{Data Models}
+There are four main types of data models:
+
+| \textbf{Data Model} | \textbf{Description} |
+| --- | --- |
+| Hierarchical | Organized as a tree-like structure (e.g., organizational charts) |
+| Network | Organized as a graph-like structure (e.g., social networks) |
+| Relational | Organized into tables with well-defined relationships between them (most common) |
+| Object-Oriented | Organized around objects and their attributes, similar to programming languages |
+
+#### Schema and Instance
+\begin{itemize}
+  \item \textbf{Schema}: A blueprint or conceptual representation of the database.
+  \item \textbf{Instance}: A snapshot of the actual data in the database.
+\end{itemize}
+
+\subsubsection*{SQL}
+SQL is a standard language for managing relational databases. It consists of:
+\begin{itemize}
+  \item \textbf{DDL (Data Definition Language)}: Used to create, modify, and delete database objects.
+  \item \textbf{DML (Data Manipulation Language)}: Used to insert, update, delete, and select data.
+  \item \textbf{DCL (Data Control Language)}: Used to grant or revoke permissions for users.
+  \item \textbf{TCL (Transaction Control Language)}: Used to control transactions.
+\end{itemize}
+
+\subsubsection*{Normalization}
+Normalization is the process of organizing data in a database to minimize data redundancy and improve data integrity. There are four normal forms:
+\begin{enumerate}
+  \item \textbf{1NF (Atomic)}: Each cell in a table contains a single value.
+  \item \textbf{2NF (No Partial Dependency)}: A table is in 2NF if it has no partial dependencies.
+  \item \textbf{3NF (No Transitive Dependencies)}: A table is in 3NF if it has no transitive dependencies.
+  \item \textbf{BCNF (Boyce-Codd Normal Form)}: The most restrictive form, where each non-key attribute depends on the entire primary key.
+\end{enumerate}
+
+\subsubsection*{ACID Properties}
+ACID properties ensure that database transactions are processed reliably:
+\begin{itemize}
+  \item \textbf{Atomicity}: Ensures that either all or none of the changes are made.
+  \item \textbf{Consistency}: Ensures that the data remains in a consistent state.
+  \item \textbf{Isolation}: Ensures that concurrent transactions do not interfere with each other.
+  \item \textbf{Durability}: Ensures that once a transaction is committed, its effects are permanent.
+\end{itemize}
+
+\subsubsection*{Concurrency Control}
+Concurrency control techniques ensure that multiple users can access and update data simultaneously:
+\begin{itemize}
+  \item \textbf{Locks}: Temporarily locks data to prevent conflicts.
+  \item \textbf{Deadlocks}: Can occur when two or more transactions wait for each other to release resources.
+  \item \textbf{Timestamps}: Assigns a timestamp to each transaction, allowing for conflict resolution.
+  \item \textbf{Optimistic vs Pessimistic}: Optimistic approaches assume that concurrent updates will not conflict, while pessimistic approaches assume they will.
+\end{itemize}
+
+\subsubsection*{Entity-Relationship Model}
+The ER model represents data as entities, attributes, and relationships:
+\begin{itemize}
+  \item \textbf{Entities}: Tables in the database.
+  \item \textbf{Attributes}: Columns in a table.
+  \item \textbf{Relationships}: Cardinality (number of instances) between tables.
+\end{itemize}
+
+\subsubsection*{Relational Algebra Operations}
+Relational algebra operations are used to manipulate relational databases:
+\begin{itemize}
+  \item \textbf{Select σ}: Selects rows based on conditions.
+  \item \textbf{Project π}: Projects attributes from a table.
+  \item \textbf{Union ∪}: Combines two or more tables into one.
+  \item \textbf{Intersection ∩}: Returns only the common elements between two tables.
+  \item \textbf{Difference −}: Returns the difference between two tables.
+\end{itemize}
+
+\subsubsection*{Indexing}
+Indexing speeds up query performance by providing quick access to data:
+\begin{itemize}
+  \item \textbf{B+ Trees}: A self-balancing search tree used for indexing.
+  \item \textbf{Hash indexes}: Use a hash function to map keys to locations in memory.
+  \item \textbf{Clustered vs Non-Clustered Indexes}: Clustered indexes store the actual data, while non-clustered indexes store only pointers.
+\end{itemize}
+
+\subsubsection*{Storage}
+Storage involves managing data on disk:
+\begin{itemize}
+  \item \textbf{Files}: Contain data that is stored on disk.
+  \item \textbf{Blocks}: A group of contiguous bytes on disk.
+  \item \textbf{Pages}: A fixed-size block of data in memory.
+\end{itemize}
+
+\subsubsection*{Recovery}
+Recovery techniques ensure data integrity after failures or crashes:
+\begin{itemize}
+  \item \textbf{Logging (Write-Ahead Log)}: Records changes to the database before they are written to disk.
+  \item \textbf{Checkpoints}: Periodically saves the state of the database to disk.
+  \item \textbf{Undo/Redo}: Allows for rolling back transactions in case of errors.
+\end{itemize}
+
+\subsubsection*{Distributed Database}
+A distributed database is a collection of databases that are connected and accessed remotely:
+\begin{itemize}
+  \item \textbf{Fragmentation}: Occurs when data is scattered across multiple nodes, making it difficult to access.
+  \item \textbf{Replication}: Copies data from one node to another to improve availability.
+\end{itemize}
+
+\subsubsection*{NoSQL Databases}
+NoSQL databases are designed for large-scale data storage and retrieval:
+\begin{itemize}
+  \item \textbf{Key-Value Stores}: Store data as key-value pairs.
+  \item \textbf{Document-Oriented Databases}: Store data in self-describing documents.
+  \item \textbf{Column-Oriented Databases}: Store data in columns instead of rows.
+  \item \textbf{Graph Databases}: Store data as nodes and edges.
+\end{itemize}
+
+\subsubsection*{Security}
+Security measures protect against unauthorized access:
+\begin{itemize}
+  \item \textbf{Authentication}: Verifies user identity before granting access.
+  \item \textbf{Authorization}: Determines what actions a user can perform on the system.
+  \item \textbf{Access Control}: Regulates who has access to sensitive data or systems.
+\end{itemize}
+
+#### SQL Injection Vulnerability!
+SQL injection occurs when an attacker injects malicious SQL code into a web application.
+
+\vspace{2cm}
+
+% Modern footer with branding
+\begin{center}
+\begin{tcolorbox}[
+    colback=primarycolor!5,
+    colframe=primarycolor!30,
+    boxrule=0.5pt,
+    arc=4pt,
+    width=0.7\textwidth,
+    left=10pt,
+    right=10pt,
+    top=6pt,
+    bottom=6pt
+]
+    \centering
+    \textcolor{primarycolor!80}{\small\textit{Generated by}} \textcolor{primarycolor}{\small\textbf{NoteTaker AI}} \\[-2pt]
+    \textcolor{secondarycolor!60}{\tiny Your intelligent note-taking companion}
+\end{tcolorbox}
+\end{center}
+
+\end{document}

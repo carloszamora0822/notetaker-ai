@@ -149,6 +149,9 @@ def index_document(text: str, metadata: Dict) -> bool:
         metadata = metadata.copy()  # Don't modify original
         metadata["class_code"] = metadata["class_code"].upper()
 
+        # Filter out None values - ChromaDB doesn't accept them
+        metadata = {k: v for k, v in metadata.items() if v is not None}
+
         # Chunk the text
         chunks = chunk_text(text)
 
@@ -165,7 +168,19 @@ def index_document(text: str, metadata: Dict) -> bool:
         base_id = f"{metadata['class_code']}_{metadata['date']}_{metadata['filename']}"
         ids = [f"{base_id}_chunk_{i}" for i in range(len(chunks))]
 
-        # Add to collection
+        # Delete existing document if it exists (handle re-uploads)
+        filename = metadata["filename"]
+        try:
+            existing = state.collection.get(where={"filename": filename})
+            if existing["ids"]:
+                logger.info(
+                    f"🔄 Updating existing document: {filename} ({len(existing['ids'])} old chunks)"
+                )
+                state.collection.delete(ids=existing["ids"])
+        except Exception as e:
+            logger.debug(f"No existing document to delete: {e}")
+
+        # Add to collection (upsert behavior)
         state.collection.add(
             embeddings=embeddings.tolist(),
             documents=chunks,

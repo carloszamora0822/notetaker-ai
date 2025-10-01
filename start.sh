@@ -16,10 +16,10 @@ if ! curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
     echo -e "${YELLOW}⚠️  Ollama not running. Starting it...${NC}"
     echo ""
     echo "   Opening new terminal for Ollama..."
-    
+
     # Start Ollama in a new terminal (macOS)
     osascript -e 'tell application "Terminal" to do script "cd '"$(pwd)"' && echo \"🤖 Ollama Service\" && echo \"\" && ollama serve"' > /dev/null 2>&1
-    
+
     # Wait for Ollama to start
     echo "   Waiting for Ollama to start..."
     for i in {1..10}; do
@@ -61,8 +61,9 @@ if lsof -Pi :8000 -sTCP:LISTEN -t >/dev/null 2>&1; then
     echo ""
 else
     # Start backend in new terminal
-    osascript -e 'tell application "Terminal" to do script "cd '"$(pwd)"' && echo \"⚙️  Backend Server\" && echo \"\" && make dev"' > /dev/null 2>&1
-    
+    PROJECT_DIR=$(pwd)
+    osascript -e 'tell application "Terminal" to do script "cd '"$PROJECT_DIR"' && echo \"⚙️  Backend Server\" && echo \"\" && echo \"Starting backend...\" && '"$PROJECT_DIR"'/.venv/bin/python3 -m uvicorn backend.main:app --host 0.0.0.0 --port 8000"' > /dev/null 2>&1
+
     # Wait for backend to start
     echo "   Waiting for backend to start..."
     BACKEND_STARTED=false
@@ -76,7 +77,7 @@ else
         sleep 1
     done
     echo ""
-    
+
     if [ "$BACKEND_STARTED" = false ]; then
         echo -e "${RED}   ❌ Backend failed to start${NC}"
         echo "   Check logs: tail -f logs/backend.log"

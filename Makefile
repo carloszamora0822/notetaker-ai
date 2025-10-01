@@ -1,3 +1,18 @@
+# Variables
+VENV = .venv
+BIN = $(VENV)/bin
+PYTHON = $(BIN)/python3
+
+.PHONY: help dev start stop
+
+help: ## Show this help message
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+
+dev: ## Start backend in development mode
+	@echo "🔧 Starting backend server..."
+	@mkdir -p logs
+	$(PYTHON) -m uvicorn backend.main:app --host 0.0.0.0 --port 8000
+
 install-latex: ## Install LaTeX dependencies (macOS)
 	@echo "📚 Installing LaTeX..."
 	@if ! command -v latexmk >/dev/null 2>&1; then \
@@ -59,7 +74,9 @@ db-health: ## Check vector database health
 
 db-cleanup: ## Clean up orphaned vectors
 	@echo "🧹 Cleaning up orphaned vectors..."
-	$(BIN)/python ops/scripts/cleanup_orphans.py
+	$(PYTHON) ops/scripts/cleanup_orphans.py
+
+db-sync: db-cleanup ## Alias for db-cleanup (sync vector DB with filesystem)
 
 start: ## Start everything (Ollama + Backend + Browser)
 	@bash start.sh
@@ -108,3 +125,29 @@ fix-ollama: ## Install recommended model (llama3.2:3b)
 	ollama pull llama3.2:3b
 	@echo "✅ Model installed!"
 	@echo "💡 Run 'make check-ollama' to verify"
+
+migrate-titles: ## Migrate files to AI-generated titles (DRY RUN first)
+	@echo "🔍 Running migration preview..."
+	$(BIN)/python ops/scripts/migrate_filenames.py --dry-run
+	@echo ""
+	@echo "💡 Review the changes above. If OK, run:"
+	@echo "   make migrate-titles-apply"
+
+migrate-titles-apply: ## Apply migration (DESTRUCTIVE)
+	@echo "⚠️  This will rename files!"
+	@read -p "Continue? [y/N] " confirm && [ "$$confirm" = "y" ] || exit 1
+	$(BIN)/python ops/scripts/migrate_filenames.py
+
+rollback-migration: ## Rollback migration (manual process)
+	@echo "⚠️  Migration rollback requires manual intervention"
+	@echo ""
+	@echo "Steps to rollback:"
+	@echo "1. Restore files from backup (if created)"
+	@echo "2. Or manually rename files back to YYYY-MM-DD_CLASS.txt format"
+	@echo "3. Run: make db-cleanup to refresh vector DB"
+	@echo ""
+	@echo "💡 Tip: Always test with --dry-run first!"
+
+test-title-gen: ## Test AI title generation
+	@echo "🧪 Running title generation tests..."
+	$(BIN)/python ops/scripts/test_title_generation.py
